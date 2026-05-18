@@ -72,7 +72,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.10', '3.11', '3.12', '3.13']
-        plone-version: ['6.1-latest', '6.0-latest']
+        plone-version: ['6.2-latest', '6.1-latest', '6.0-latest']
+        include:
+          - python-version: "3.14"
+            plone-version: "6.2-latest"
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       PLONE_VERSION: ${{ matrix.plone-version }}
