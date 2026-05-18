@@ -9,6 +9,28 @@
 
 <!-- towncrier release notes start -->
 
+## 1.0.0 (2026-05-19)
+
+
+### New features:
+
+- Added class-scoped portal fixtures `portal_class` and `functional_portal_class`. They share a single Plone Site across every test method in a class and honor `@pytest.mark.portal` when applied at the class level — ideal for REST API and service test suites that need a persistent portal. @ericof [#41](https://github.com/plone/pytest-plone/issues/41)
+
+
+### Bug fixes:
+
+- Fix CI dependency resolution: `plone-stubs` is now appended to `requirements-mxdev.txt` (with a Python 3.12+ marker) from the Makefile, instead of being declared in `[project.optional-dependencies]` with a `[tool.uv.sources]` git pointer that `uv pip install` ignored. @ericof [#45](https://github.com/plone/pytest-plone/issues/45)
+
+
+### Internal:
+
+- Update repository URL in package metadata and README to https://github.com/plone/pytest-plone — repository moved from the `collective` organization to `plone`. @ericof 
+
+
+### Tests
+
+- Test on Plone 6.2 as well, and include Python 3.14.  @mauritsvanrees 
+
 ## 1.0.0a3 (2026-04-18)
 
 
