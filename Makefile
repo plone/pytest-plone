@@ -67,10 +67,15 @@ config: instance/etc/zope.ini
 # Install
 ############################################
 
-requirements-mxdev.txt: ## Generate constraints file
+requirements-mxdev.txt: pyproject.toml mx.ini ## Generate constraints file
 	@echo "$(GREEN)==> Generate constraints file$(RESET)"
 	@echo '-c https://dist.plone.org/release/$(PLONE_VERSION)/constraints.txt' > requirements.txt
 	@uvx mxdev -c mx.ini
+	@# plone-stubs is not on PyPI; install from git only on Python >= 3.12.
+	@# The marker has to live here (not in pyproject.toml or mx.ini), since
+	@# uv pip install does not honor [tool.uv.sources] when managed = false,
+	@# and mxdev sections do not support PEP 508 markers per section.
+	@echo "plone-stubs @ git+https://github.com/plone/plone-stubs.git ; python_version >= '3.12'" >> requirements-mxdev.txt
 
 $(VENV_FOLDER): requirements-mxdev.txt ## Install dependencies
 	@echo "$(GREEN)==> Install environment$(RESET)"
