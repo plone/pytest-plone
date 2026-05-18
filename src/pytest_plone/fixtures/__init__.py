@@ -11,8 +11,10 @@ from .base import app
 from .base import functional_app
 from .base import functional_http_request
 from .base import functional_portal
+from .base import functional_portal_class
 from .base import http_request
 from .base import portal
+from .base import portal_class
 from .content import create_content
 from .content import get_behaviors
 from .content import get_fti
@@ -36,6 +38,7 @@ __all__ = [
     "functional_app",
     "functional_http_request",
     "functional_portal",
+    "functional_portal_class",
     "generate_mo",
     "get_behaviors",
     "get_fti",
@@ -45,6 +48,7 @@ __all__ = [
     "installer",
     "manager_request",
     "portal",
+    "portal_class",
     "profile_last_version",
     "request_factory",
     "setup_tool",

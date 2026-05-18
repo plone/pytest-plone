@@ -117,6 +117,34 @@ def test_portal_title(portal):
 
 ```
 
+### portal_class
+
+|  |  |
+| --- | --- |
+| Description | Portal object shared across every test method in a class. Honors class-level `@pytest.mark.portal`. |
+| Required Fixture | **integration_class** |
+| Scope | **Class** |
+
+Class-scoped counterpart to `portal`. Setup runs once per class instead of once per test, so any state created (content, roles, profiles applied) is shared across the class's test methods.
+
+Because the fixture is class-scoped, only `@pytest.mark.portal` decorators applied to the **class** are honored — method-level markers are ignored.
+
+```python
+import pytest
+
+
+@pytest.mark.portal(
+    content=[{"type": "Document", "id": "doc1", "title": "Doc"}],
+    roles=["Manager"],
+)
+class TestDocument:
+    def test_doc_exists(self, portal_class):
+        assert "doc1" in portal_class
+
+    def test_doc_title(self, portal_class):
+        assert portal_class["doc1"].title == "Doc"
+```
+
 ### http_request
 
 |  |  |
@@ -169,6 +197,26 @@ Parallel to `portal`, but bound to the functional layer. Accepts the same `@pyte
 def test_functional_portal_title(functional_portal):
     """Test portal title on the functional layer."""
     assert functional_portal.title == "Plone site"
+```
+
+### functional_portal_class
+
+|  |  |
+| --- | --- |
+| Description | Portal object on the **functional** testing layer, shared across every test method in a class. Honors class-level `@pytest.mark.portal`. |
+| Required Fixture | **functional_class** |
+| Scope | **Class** |
+
+Class-scoped counterpart to `functional_portal`. The typical use case is a REST API or service test suite that needs a persistent portal across many test methods. As with `portal_class`, only class-level `@pytest.mark.portal` decorators are honored.
+
+```python
+import pytest
+
+
+@pytest.mark.portal(roles=["Manager"])
+class TestRESTService:
+    def test_portal_available(self, functional_portal_class):
+        assert functional_portal_class.title == "Plone site"
 ```
 
 ### functional_http_request
