@@ -56,10 +56,10 @@ test = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/collective/pytest-plone"
+Homepage = "https://github.com/plone/pytest-plone"
 PyPI = "https://pypi.org/project/pytest-plone"
-Source = "https://github.com/collective/pytest-plone"
-Tracker = "https://github.com/collective/pytest-plone/issues"
+Source = "https://github.com/plone/pytest-plone"
+Tracker = "https://github.com/plone/pytest-plone/issues"
 
 
 [project.entry-points.pytest11]
@@ -99,7 +99,7 @@ filename = "CHANGELOG.md"
 start_string = "<!-- towncrier release notes start -->\n"
 title_format = "## {version} ({project_date})"
 template = "news/.changelog_template.jinja"
-issue_format = "[#{issue}](https://github.com/collective/pytest-plone/issues/{issue})"
+issue_format = "[#{issue}](https://github.com/plone/pytest-plone/issues/{issue})"
 underlines = ["", "", ""]
 
 [[tool.towncrier.type]]

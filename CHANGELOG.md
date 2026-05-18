@@ -14,10 +14,10 @@
 
 ### New features:
 
-- Added `@pytest.mark.portal` marker support for configuring the `portal` fixture with GenericSetup profiles, pre-created content, and user roles. @ericof [#37](https://github.com/collective/pytest-plone/issues/37)
-- Added the `uninstalled` fixture — reads a user-provided `package_name` fixture and calls `installer.uninstall_product`, removing boilerplate from the canonical add-on uninstall smoke test. @ericof [#38](https://github.com/collective/pytest-plone/issues/38)
-- Added `functional_app`, `functional_portal`, and `functional_http_request` fixtures — functional-layer counterparts to `app`, `portal`, and `http_request`. `functional_portal` honors the `@pytest.mark.portal` marker. @ericof [#39](https://github.com/collective/pytest-plone/issues/39)
-- Added `request_factory`, `manager_request`, and `anon_request` fixtures — build a `RelativeSession` against the functional portal with Manager, Anonymous, or custom basic-auth credentials. Replaces boilerplate duplicated across downstream codebases. @ericof [#40](https://github.com/collective/pytest-plone/issues/40)
+- Added `@pytest.mark.portal` marker support for configuring the `portal` fixture with GenericSetup profiles, pre-created content, and user roles. @ericof [#37](https://github.com/plone/pytest-plone/issues/37)
+- Added the `uninstalled` fixture — reads a user-provided `package_name` fixture and calls `installer.uninstall_product`, removing boilerplate from the canonical add-on uninstall smoke test. @ericof [#38](https://github.com/plone/pytest-plone/issues/38)
+- Added `functional_app`, `functional_portal`, and `functional_http_request` fixtures — functional-layer counterparts to `app`, `portal`, and `http_request`. `functional_portal` honors the `@pytest.mark.portal` marker. @ericof [#39](https://github.com/plone/pytest-plone/issues/39)
+- Added `request_factory`, `manager_request`, and `anon_request` fixtures — build a `RelativeSession` against the functional portal with Manager, Anonymous, or custom basic-auth credentials. Replaces boilerplate duplicated across downstream codebases. @ericof [#40](https://github.com/plone/pytest-plone/issues/40)
 - Added `apply_profiles` session-scoped fixture to apply GenericSetup profiles to a Plone site. @ericof 
 - Added `create_content` session-scoped fixture to create content items in a Plone site as the site owner. @ericof 
 - Added `grant_roles` session-scoped fixture to grant local roles to the test user on a given context. @ericof 
@@ -34,39 +34,39 @@
 
 ### Internal:
 
-- Upgrade zope.pytest to version 8.3. @ericof [#35](https://github.com/collective/pytest-plone/issues/35)
+- Upgrade zope.pytest to version 8.3. @ericof [#35](https://github.com/plone/pytest-plone/issues/35)
 - Fix Makefile release target @ericof 
 - Upgrade pytest to version 8.4.0. @ericof 
 
 
 ### Documentation:
 
-- Fix Tests badge on `README.md`. @stevepiercy [#31](https://github.com/collective/pytest-plone/issues/31)
+- Fix Tests badge on `README.md`. @stevepiercy [#31](https://github.com/plone/pytest-plone/issues/31)
 
 ## 1.0.0a1 (2025-03-27)
 
 
 ### Breaking changes:
 
-- Drop support for Python 3.8 @ericof [#17](https://github.com/collective/pytest-plone/issues/17)
-- Drop support for Python 3.9 @ericof [#18](https://github.com/collective/pytest-plone/issues/18)
+- Drop support for Python 3.8 @ericof [#17](https://github.com/plone/pytest-plone/issues/17)
+- Drop support for Python 3.9 @ericof [#18](https://github.com/plone/pytest-plone/issues/18)
 
 
 ### New features:
 
-- Add support for Python 3.13 @ericof [#19](https://github.com/collective/pytest-plone/issues/19)
-- Add support for Plone 6.1 @ericof [#20](https://github.com/collective/pytest-plone/issues/20)
-- Add docstring for every fixture provided by pytest-plone @ericof [#24](https://github.com/collective/pytest-plone/issues/24)
+- Add support for Python 3.13 @ericof [#19](https://github.com/plone/pytest-plone/issues/19)
+- Add support for Plone 6.1 @ericof [#20](https://github.com/plone/pytest-plone/issues/20)
+- Add docstring for every fixture provided by pytest-plone @ericof [#24](https://github.com/plone/pytest-plone/issues/24)
 
 
 ### Internal:
 
-- Move from `setuptools` to `hatchling` for package build. @ericof [#21](https://github.com/collective/pytest-plone/issues/21)
-- Package metadata now lives in `pyproject.toml`. @ericof [#22](https://github.com/collective/pytest-plone/issues/22)
-- Use UV to manage the development environment. @ericof [#23](https://github.com/collective/pytest-plone/issues/23)
-- Add default `.vscode` configuration @ericof [#25](https://github.com/collective/pytest-plone/issues/25)
-- Add type hints and check codebase with `mypy` [#27](https://github.com/collective/pytest-plone/issues/27)
-- Don't reformat `.md` files. @stevepiercy [#28](https://github.com/collective/pytest-plone/issues/28)
+- Move from `setuptools` to `hatchling` for package build. @ericof [#21](https://github.com/plone/pytest-plone/issues/21)
+- Package metadata now lives in `pyproject.toml`. @ericof [#22](https://github.com/plone/pytest-plone/issues/22)
+- Use UV to manage the development environment. @ericof [#23](https://github.com/plone/pytest-plone/issues/23)
+- Add default `.vscode` configuration @ericof [#25](https://github.com/plone/pytest-plone/issues/25)
+- Add type hints and check codebase with `mypy` [#27](https://github.com/plone/pytest-plone/issues/27)
+- Don't reformat `.md` files. @stevepiercy [#28](https://github.com/plone/pytest-plone/issues/28)
 
 ## 0.5.0 (2024-05-15)
 
