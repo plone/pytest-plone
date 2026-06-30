@@ -1,0 +1,1 @@
+Fix `make install` (and CI) on Python 3.10: invoke mxdev with its `uv` extra (`uvx --from "mxdev[uv]" mxdev`) so the `tomlkit` dependency required by mxdev's uv hook is available. @jensens
