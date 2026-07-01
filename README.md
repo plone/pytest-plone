@@ -65,6 +65,26 @@ In the code above, the following pytest fixtures will be available to your tests
 | integration_class | Class |
 | integration | Function |
 
+### Session-wide layers
+
+By default `fixtures_factory` registers an autouse session fixture per layer, so each testing layer is set up **once per session**.
+This matters for plain function-style tests (`def test_x(portal): ...`): they only depend on the function- and class-scoped fixtures, never on the session fixture, so without this the layer would be torn down and set up again — running a full `applyProfile` — around *every single test*.
+Per-test isolation is unaffected: `IntegrationTesting` still rolls back the transaction after each test.
+
+If you need the previous behavior, pass `keep_session=False`:
+
+```python
+globals().update(
+    fixtures_factory(
+        (
+            (PRODUCTS_CMFPLONE_FUNCTIONAL_TESTING, "functional"),
+            (PRODUCTS_CMFPLONE_INTEGRATION_TESTING, "integration"),
+        ),
+        keep_session=False,
+    )
+)
+```
+
 
 ## Fixtures
 

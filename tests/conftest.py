@@ -32,6 +32,32 @@ def testdir(pytester: Pytester) -> Pytester:
     return pytester
 
 
+@pytest.fixture
+def testdir_no_keep(pytester: Pytester) -> Pytester:
+    # Like ``testdir`` but opts out of the session-wide layer keep.
+    pytester.makeconftest(
+        """
+        from Products.CMFPlone.testing import PRODUCTS_CMFPLONE_FUNCTIONAL_TESTING
+        from Products.CMFPlone.testing import PRODUCTS_CMFPLONE_INTEGRATION_TESTING
+        from pytest_plone import fixtures_factory
+
+        pytest_plugins = ["pytest_plone"]
+
+        globals().update(
+            fixtures_factory(
+                (
+                    (PRODUCTS_CMFPLONE_FUNCTIONAL_TESTING, "functional"),
+                    (PRODUCTS_CMFPLONE_INTEGRATION_TESTING, "integration"),
+                ),
+                keep_session=False,
+            )
+        )
+
+        """
+    )
+    return pytester
+
+
 OUR_FIXTURES = [
     "anon_request",
     "app",
