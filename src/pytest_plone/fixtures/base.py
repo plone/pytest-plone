@@ -16,7 +16,7 @@ def app(integration: Layer) -> Application:
 
     Example usage:
     ```python
-    def test_app(self, app):
+    def test_app(app):
         assert app.title == "Zope"
     ```
     """
@@ -32,7 +32,7 @@ def portal(integration: Layer, request: pytest.FixtureRequest) -> PloneSite:
 
     Example usage:
     ```python
-    def test_portal(self, portal):
+    def test_portal(portal):
         assert portal.title == "Plone site"
 
     @pytest.mark.portal(
@@ -40,7 +40,7 @@ def portal(integration: Layer, request: pytest.FixtureRequest) -> PloneSite:
         content=[{"type": "Document", "id": "doc1", "title": "A document"}],
         roles=["Manager"],
     )
-    def test_portal_with_marker(self, portal):
+    def test_portal_with_marker(portal):
         assert "doc1" in portal
     ```
     """
@@ -95,8 +95,8 @@ def http_request(integration: Layer) -> HTTPRequest:
 
     Example usage:
     ```python
-    def test_request(self, request):
-        assert request.method == "GET"
+    def test_http_request(http_request):
+        assert http_request.method == "GET"
     ```
     """
     return integration["request"]
@@ -112,7 +112,7 @@ def functional_app(functional: Layer) -> Application:
 
     Example usage:
     ```python
-    def test_functional_app(self, functional_app):
+    def test_functional_app(functional_app):
         assert functional_app.title == "Zope"
     ```
     """
@@ -129,7 +129,7 @@ def functional_portal(functional: Layer, request: pytest.FixtureRequest) -> Plon
 
     Example usage:
     ```python
-    def test_functional_portal(self, functional_portal):
+    def test_functional_portal(functional_portal):
         assert functional_portal.title == "Plone site"
     ```
     """
@@ -159,7 +159,7 @@ def functional_portal_class(
             assert functional_portal_class.title == "Plone site"
 
         def test_two(self, functional_portal_class):
-            ...
+            assert "plone" in functional_portal_class.absolute_url()
     ```
     """
     functional_class.testSetUp()
@@ -179,7 +179,7 @@ def functional_http_request(functional: Layer) -> HTTPRequest:
 
     Example usage:
     ```python
-    def test_functional_request(self, functional_http_request):
+    def test_functional_http_request(functional_http_request):
         assert functional_http_request.method == "GET"
     ```
     """

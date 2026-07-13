@@ -407,7 +407,7 @@ def test_block_in_document(get_behaviors):
         "volto.head_title",
     ],
 )
-def test_has_behavior(self, get_behaviors, behavior):
+def test_has_behavior(get_behaviors, behavior):
     assert behavior in get_behaviors("Document")
 ```
 
