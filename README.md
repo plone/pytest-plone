@@ -165,6 +165,22 @@ class TestDocument:
         assert portal_class["doc1"].title == "Doc"
 ```
 
+### app_class
+
+|  |  |
+| --- | --- |
+| Description | Zope root shared across every test method in a class. |
+| Required Fixture | **integration_class** |
+| Scope | **Class** |
+
+Class-scoped counterpart to `app`. Shares the single per-class setup/teardown of `portal_class` (the app is the portal's container), so a class can request both `app_class` and `portal_class` without setting the layer up twice.
+
+```python
+class TestApp:
+    def test_app_root(self, app_class):
+        assert app_class.getPhysicalPath() == ("",)
+```
+
 ### http_request
 
 |  |  |
@@ -237,6 +253,22 @@ import pytest
 class TestRESTService:
     def test_portal_available(self, functional_portal_class):
         assert functional_portal_class.title == "Plone site"
+```
+
+### functional_app_class
+
+|  |  |
+| --- | --- |
+| Description | Zope root on the **functional** testing layer, shared across every test method in a class. |
+| Required Fixture | **functional_class** |
+| Scope | **Class** |
+
+Class-scoped counterpart to `functional_app`. Shares the single per-class setup/teardown of `functional_portal_class`, so a class can request both without setting the layer up twice.
+
+```python
+class TestFunctionalApp:
+    def test_app_root(self, functional_app_class):
+        assert functional_app_class.getPhysicalPath() == ("",)
 ```
 
 ### functional_http_request

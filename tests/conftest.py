@@ -61,11 +61,13 @@ def testdir_no_keep(pytester: Pytester) -> Pytester:
 OUR_FIXTURES = [
     "anon_request",
     "app",
+    "app_class",
     "apply_profiles",
     "browser_layers",
     "controlpanel_actions",
     "create_content",
     "functional_app",
+    "functional_app_class",
     "functional_http_request",
     "functional_portal",
     "functional_portal_class",
