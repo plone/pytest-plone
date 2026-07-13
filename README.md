@@ -165,6 +165,22 @@ class TestDocument:
         assert portal_class["doc1"].title == "Doc"
 ```
 
+### app_class
+
+|  |  |
+| --- | --- |
+| Description | Zope root shared across every test method in a class. |
+| Required Fixture | **integration_class** |
+| Scope | **Class** |
+
+Class-scoped counterpart to `app`. Shares the single per-class setup/teardown of `portal_class` (the app is the portal's container), so a class can request both `app_class` and `portal_class` without setting the layer up twice.
+
+```python
+class TestApp:
+    def test_app_root(self, app_class):
+        assert app_class.getPhysicalPath() == ("",)
+```
+
 ### http_request
 
 |  |  |
@@ -237,6 +253,22 @@ import pytest
 class TestRESTService:
     def test_portal_available(self, functional_portal_class):
         assert functional_portal_class.title == "Plone site"
+```
+
+### functional_app_class
+
+|  |  |
+| --- | --- |
+| Description | Zope root on the **functional** testing layer, shared across every test method in a class. |
+| Required Fixture | **functional_class** |
+| Scope | **Class** |
+
+Class-scoped counterpart to `functional_app`. Shares the single per-class setup/teardown of `functional_portal_class`, so a class can request both without setting the layer up twice.
+
+```python
+class TestFunctionalApp:
+    def test_app_root(self, functional_app_class):
+        assert functional_app_class.getPhysicalPath() == ("",)
 ```
 
 ### functional_http_request
@@ -407,7 +439,7 @@ def test_block_in_document(get_behaviors):
         "volto.head_title",
     ],
 )
-def test_has_behavior(self, get_behaviors, behavior):
+def test_has_behavior(get_behaviors, behavior):
     assert behavior in get_behaviors("Document")
 ```
 
@@ -567,6 +599,71 @@ def test_public_endpoint(anon_request):
     assert response.status_code == 200
 ```
 
+### site_owner_name / site_owner_password
+
+|  |  |
+| --- | --- |
+| Description | Login name / password of the site owner (Manager) test user. |
+| Required Fixture |  |
+| Scope | **Session** |
+
+Session-scoped accessors for `SITE_OWNER_NAME` / `SITE_OWNER_PASSWORD` from `plone.app.testing`, so tests and other fixtures can depend on them instead of importing the constants directly.
+
+### create_site
+
+|  |  |
+| --- | --- |
+| Description | Callable that creates a Plone site from a `plone.distribution` distribution. |
+| Required Fixture | **distribution_name**, **site_owner_name** |
+| Scope | **Session** |
+
+Returns a callable `func(app, answers) -> PloneSite`. It deletes any existing site with the same `site_id` first (clean state), creates a **new** site from the `distribution_name` distribution as the site owner, and sets it as the current local site. The created site coexists with the site provided by the testing layer (a second site, by design).
+
+The supporting fixtures are all session-scoped and meant to be **overridden** in your own `conftest.py`:
+
+| Fixture | Description |
+| --- | --- |
+| `distribution_name` | Name of the distribution to create sites from (default `"testing"`). |
+| `answers` | Mapping of answers passed to the distribution handler (site id, title, language, ...). |
+| `site_logo` | Data-URI logo used as the `site_logo` answer. |
+
+The distribution named by `distribution_name` must be registered — e.g. load the ZCML of a package that registers it via `<plone:distribution>`.
+
+Override `distribution_name` and `answers` in your own `conftest.py` to point at your distribution and customize the site:
+
+```python
+import pytest
+
+
+@pytest.fixture(scope="session")
+def distribution_name() -> str:
+    return "my.distribution"
+
+
+@pytest.fixture(scope="session")
+def answers(site_logo: str) -> dict:
+    return {
+        "site_id": "plone-site",
+        "title": "My Site",
+        "description": "A site built from my distribution.",
+        "default_language": "en",
+        "portal_timezone": "UTC",
+        "site_logo": site_logo,
+        "setup_content": False,
+    }
+
+
+class TestDistribution:
+    @pytest.fixture(autouse=True)
+    def _setup(self, app):
+        self.app = app
+
+    def test_site_from_distribution(self, create_site, answers):
+        site = create_site(self.app, answers)
+        assert site.getId() == "plone-site"
+        assert site.title == "My Site"
+```
+
 ## Markers
 
 ### @pytest.mark.portal
@@ -596,6 +693,41 @@ def test_something(portal):
 ```
 
 Tests without the marker see no behavior change — fully backwards-compatible.
+
+#### Content specifications
+
+Each dict in `content` is passed as keyword arguments to `plone.api.content.create`. Two keys receive special handling and are consumed before the call:
+
+| Key | Description |
+| --- | --- |
+| `_container` | Path to the container the item is created in, relative to the site root (e.g. `"/folder"`). Defaults to the portal when absent. |
+| `_review_state` | Target workflow state; the item is transitioned there after creation via `plone.api.content.transition`. |
+
+Items are created in list order, so a container listed earlier can be referenced by a later item's `_container`:
+
+```python
+import pytest
+
+
+@pytest.mark.portal(
+    content=[
+        {"type": "Folder", "id": "folder", "title": "Folder"},
+        {
+            "type": "Document",
+            "id": "doc1",
+            "title": "Nested & published",
+            "_container": "/folder",
+            "_review_state": "published",
+        },
+    ],
+)
+def test_nested_content(portal):
+    """The document lives in the folder and is published."""
+    from plone import api
+
+    doc = portal["folder"]["doc1"]
+    assert api.content.get_state(obj=doc) == "published"
+```
 
 ## Plugin Development
 

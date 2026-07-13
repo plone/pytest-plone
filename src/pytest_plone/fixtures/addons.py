@@ -68,8 +68,7 @@ def browser_layers(portal: PloneSite) -> list[InterfaceClass]:
 
     Example usage:
     ```python
-
-    def test_browserlayer(self, browser_layers):
+    def test_browserlayer(browser_layers):
         from collective.person.interfaces import IBrowserLayer
 
         assert IBrowserLayer in browser_layers
@@ -84,8 +83,7 @@ def controlpanel_actions(portal: PloneSite) -> list[str]:
 
     Example usage:
     ```python
-
-    def test_controlpanel_installed(self, controlpanel_actions):
+    def test_controlpanel_installed(controlpanel_actions):
         assert "MyControlPanel" in controlpanel_actions
     ```
     """
@@ -99,11 +97,10 @@ def setup_tool(portal: PloneSite) -> SetupTool:
 
     Example usage:
     ```python
-
-    def test_profile_version(self, setup_tool):
-        name = "profile-collective.person:default
+    def test_profile_version(setup_tool):
+        name = "profile-collective.person:default"
         version = setup_tool.getLastVersionForProfile(name)
-        return version[0] == "1000
+        assert version[0] == "1000"
     ```
     """
     return api.portal.get_tool("portal_setup")
@@ -117,7 +114,7 @@ def profile_last_version(setup_tool: SetupTool) -> t.ProfileVersionGetter:
     ```python
     PACKAGE_NAME = "collective.person"
 
-    def test_latest_version(self, profile_last_version):
+    def test_latest_version(profile_last_version):
         assert profile_last_version(f"{PACKAGE_NAME}:default") == "1000"
     ```
     """

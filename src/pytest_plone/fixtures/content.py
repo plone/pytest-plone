@@ -17,9 +17,9 @@ def get_fti(portal: PloneSite) -> t.FTIGetter:
 
     Example usage:
     ```python
-    def test_fti(self, get_fti):
+    def test_fti(get_fti):
         fti = get_fti("Person")
-        assert isinstance(fti, IDexterityFTI)
+        assert IDexterityFTI.providedBy(fti)
         assert fti.title == "Person"
     ```
     """
@@ -37,7 +37,7 @@ def get_behaviors(get_fti: t.FTIGetter) -> t.BehaviorsGetter:
 
     Example usage:
     ```python
-    def test_behaviors(self, get_behaviors):
+    def test_behaviors(get_behaviors):
         behaviors = get_behaviors("Person")
         assert "plone.namefromtitle" in behaviors
     ```
