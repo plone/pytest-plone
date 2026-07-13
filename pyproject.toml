@@ -74,6 +74,7 @@ docs = [
 
 [project.urls]
 Homepage = "https://github.com/plone/pytest-plone"
+Documentation = "https://plone.github.io/pytest-plone"
 PyPI = "https://pypi.org/project/pytest-plone"
 Source = "https://github.com/plone/pytest-plone"
 Tracker = "https://github.com/plone/pytest-plone/issues"

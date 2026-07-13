@@ -12,7 +12,8 @@
 [![PyPI - Plone Versions](https://img.shields.io/pypi/frameworkversions/plone/pytest-plone)](https://pypi.org/project/pytest-plone/)
 
 [![Tests](https://github.com/plone/pytest-plone/actions/workflows/ci.yml/badge.svg)](https://github.com/plone/pytest-plone/actions/workflows/ci.yml)
-![Code Style](https://img.shields.io/badge/Code%20Style-Black-000000)
+
+![Code Style](https://img.shields.io/badge/Code%20Style-Ruff-000000)
 
 [![GitHub contributors](https://img.shields.io/github/contributors/plone/pytest-plone)](https://github.com/plone/pytest-plone)
 [![GitHub Repo stars](https://img.shields.io/github/stars/plone/pytest-plone?style=social)](https://github.com/plone/pytest-plone)
@@ -23,6 +24,8 @@
 
 This package is built on top of [zope.pytestlayer](https://github.com/zopefoundation/zope.pytestlayer).
 
+
+The documentation can be accessed at [plone.github.io/pytest-plone/](https://plone.github.io/pytest-plone/)
 
 ## Reasoning
 
