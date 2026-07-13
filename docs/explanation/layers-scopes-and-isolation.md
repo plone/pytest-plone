@@ -134,3 +134,31 @@ Use **session** scope for things that are genuinely global and immutable, such a
 `pytest-plone` ships class-scoped `portal_class` and `functional_portal_class` for precisely the middle case.
 They carry one caveat worth understanding rather than memorizing: a class-scoped fixture is created once, before any method runs, so it cannot see a marker attached to an individual method.
 Only class-level `@pytest.mark.portal` is visible to it.
+
+## Why you cannot simply change the scope
+
+Reach for those fixtures rather than writing your own.
+The reason is the sharpest edge in the seam between the two models, and it is worth understanding, because the error it produces looks like nothing at all.
+
+Suppose you have a working function-scoped fixture and want it once per class:
+
+```python
+@pytest.fixture(scope="class")
+def my_portal(functional_class):
+    return functional_class["portal"]
+```
+
+That raises `KeyError: 'portal'`.
+
+The layer's `portal` key is not an attribute of the layer.
+It is set in `testSetUp`, as part of the per-test lifecycle — and `zope.pytestlayer` invokes `testSetUp` **only for the function-scoped fixture**.
+At class scope, that never runs.
+The key does not exist yet, so the lookup fails.
+
+The mistake is a reasonable one.
+pytest scopes usually *are* a drop-in change: you write `scope="class"` and the fixture is built less often.
+Here they are not, because the layer keeps its own lifecycle underneath, and pytest's scopes do not drive it.
+
+`portal_class` and `functional_portal_class` exist to bridge exactly this.
+They call `testSetUp` themselves, yield the portal, and call `testTearDown` afterwards, so one portal and one transaction span every method in the class.
+That is the part you would otherwise have to reimplement, and it is why you should not.

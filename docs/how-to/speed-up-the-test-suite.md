@@ -61,6 +61,26 @@ The tests in the class share one portal, so state created by one method is visib
 Use this when the tests only read, or when the shared state is the point.
 ```
 
+### Do not write your own class-scoped portal fixture
+
+It is tempting to take a working function-scoped fixture and just widen its scope:
+
+```python
+@pytest.fixture(scope="class")
+def my_portal(functional_class):
+    return functional_class["portal"]
+```
+
+This raises `KeyError: 'portal'`.
+
+The layer sets its `portal` key in `testSetUp`, which `zope.pytestlayer` runs only for the function-scoped fixture.
+At class scope it never runs, so the key does not exist.
+
+Use `portal_class` or `functional_portal_class` instead.
+They drive that lifecycle themselves, which is the work you would otherwise have to reproduce.
+
+{doc}`/explanation/layers-scopes-and-isolation` explains why the two models do not line up here.
+
 ## Run tests in parallel
 
 `pytest-xdist` distributes tests across processes:
