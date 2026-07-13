@@ -1,0 +1,14 @@
+# Dependencies for building the documentation.
+#
+# Deliberately does NOT install pytest-plone itself. sphinx-autodoc2 analyses
+# the source statically (see docs/conf.py) and never imports the package, so
+# pulling in Products.CMFPlone and the rest of the runtime dependencies would
+# cost minutes and buy nothing.
+sphinx
+sphinx-autodoc2
+# [linkify] pulls in linkify-it-py, required by the `linkify` MyST extension
+# enabled in conf.py.
+myst-parser[linkify]
+plone-sphinx-theme
+sphinx-copybutton
+sphinx-design
