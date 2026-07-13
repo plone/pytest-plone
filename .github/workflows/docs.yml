@@ -51,6 +51,9 @@ jobs:
 
       - name: Install Dependencies
         shell: bash
+        env:
+          PLONE_VERSION: ${{ inputs.plone-version }}
+          PYTHON_VERSION: ${{ inputs.python-version }}
         run: make install
 
       - name: Build HTML documentation
