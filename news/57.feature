@@ -1,0 +1,1 @@
+Added class-scoped ``app_class`` and ``functional_app_class`` fixtures returning the Zope app root, so accessing the app at class scope no longer requires going through ``portal_class`` and ``aq_parent``. @ericof

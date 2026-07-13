@@ -1,0 +1,1 @@
+Added regression tests proving ``@pytest.mark.portal`` changes (content, roles, profiles) are undone after each test by the testing layer — including committed functional-layer content served over real HTTP, which ``FunctionalTesting`` discards per test. @ericof

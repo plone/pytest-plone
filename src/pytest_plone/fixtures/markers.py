@@ -28,14 +28,44 @@ def apply_profiles(portal: PloneSite, profiles: list[str]) -> None:
             setup_tool.runAllImportStepsFromProfile(profile_id)
 
 
-def create_content(container: PortalContent, content: list[dict]) -> None:
-    """Create content items in a container.
+def create_content(portal: PortalContent, content: list[dict]) -> list[PortalContent]:
+    """Create content items, optionally in a distinct container and review state.
 
-    Each dict in *content* is passed as keyword arguments to
-    ``plone.api.content.create(container=container, **spec)``.
+    Each entry in *content* is a mapping passed as keyword arguments to
+    :func:`plone.api.content.create`. Two keys receive special handling and
+    are consumed before the call:
+
+    - ``_container``: path to the container the item is created in, relative to
+      the site root as understood by :func:`plone.api.content.get`
+      (e.g. ``"/folder"``). Defaults to *portal* when absent.
+    - ``_review_state``: target workflow state; the created item is transitioned
+      to it via :func:`plone.api.content.transition`.
+
+    :param portal: default container used when a spec omits ``_container``.
+    :param content: list of content specifications.
+    :returns: the created content items, in creation order.
     """
+    items = []
     for spec in content:
-        api.content.create(container=container, **spec)
+        # Copy so the special keys we pop below don't mutate the marker's
+        # dicts, which are reused across parametrized runs of the same test.
+        spec = dict(spec)
+        container = portal
+        # Get the container for the content item.
+        if container_path := spec.pop("_container", None):
+            container = api.content.get(path=container_path)
+        # If a review state is specified, we transition the content to
+        # that state after creation.
+        to_state = spec.pop("_review_state", None)
+        item = api.content.create(container=container, **spec)
+        if to_state is not None:
+            api.content.transition(obj=item, to_state=to_state)
+        items.append(item)
+    # Force a reindex: content created here has been observed to stay stale in
+    # the catalog (not returned by queries) until reindexed explicitly.
+    for item in items:
+        item.reindexObject()
+    return items
 
 
 def grant_roles(context: PortalContent, roles: list[str]) -> None:
