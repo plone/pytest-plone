@@ -1,3 +1,4 @@
+from OFS.Application import Application
 from OFS.SimpleItem import Item
 from plone.app.vocabularies import PermissiveVocabulary
 from plone.app.vocabularies import SlicableVocabulary
@@ -56,3 +57,7 @@ class RequestFactory(Protocol):
         basic_auth: tuple[str, str] | None = ...,
         api: bool = ...,
     ) -> Any: ...
+
+
+class SiteCreator(Protocol):
+    def __call__(self, app: Application, answers: dict) -> PloneSite: ...

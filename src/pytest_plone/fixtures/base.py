@@ -3,11 +3,31 @@
 from .markers import apply_portal_marker
 from collections.abc import Generator
 from OFS.Application import Application
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.testing.layer import Layer
 from Products.CMFPlone.Portal import PloneSite
 from ZPublisher.HTTPRequest import HTTPRequest
 
 import pytest
+
+
+@pytest.fixture(scope="session")
+def site_owner_name() -> str:
+    """Return the login name of the site owner (Manager) test user.
+
+    :returns: the ``SITE_OWNER_NAME`` from :mod:`plone.app.testing`.
+    """
+    return SITE_OWNER_NAME
+
+
+@pytest.fixture(scope="session")
+def site_owner_password() -> str:
+    """Return the password of the site owner (Manager) test user.
+
+    :returns: the ``SITE_OWNER_PASSWORD`` from :mod:`plone.app.testing`.
+    """
+    return SITE_OWNER_PASSWORD
 
 
 @pytest.fixture()

@@ -599,6 +599,71 @@ def test_public_endpoint(anon_request):
     assert response.status_code == 200
 ```
 
+### site_owner_name / site_owner_password
+
+|  |  |
+| --- | --- |
+| Description | Login name / password of the site owner (Manager) test user. |
+| Required Fixture |  |
+| Scope | **Session** |
+
+Session-scoped accessors for `SITE_OWNER_NAME` / `SITE_OWNER_PASSWORD` from `plone.app.testing`, so tests and other fixtures can depend on them instead of importing the constants directly.
+
+### create_site
+
+|  |  |
+| --- | --- |
+| Description | Callable that creates a Plone site from a `plone.distribution` distribution. |
+| Required Fixture | **distribution_name**, **site_owner_name** |
+| Scope | **Session** |
+
+Returns a callable `func(app, answers) -> PloneSite`. It deletes any existing site with the same `site_id` first (clean state), creates a **new** site from the `distribution_name` distribution as the site owner, and sets it as the current local site. The created site coexists with the site provided by the testing layer (a second site, by design).
+
+The supporting fixtures are all session-scoped and meant to be **overridden** in your own `conftest.py`:
+
+| Fixture | Description |
+| --- | --- |
+| `distribution_name` | Name of the distribution to create sites from (default `"testing"`). |
+| `answers` | Mapping of answers passed to the distribution handler (site id, title, language, ...). |
+| `site_logo` | Data-URI logo used as the `site_logo` answer. |
+
+The distribution named by `distribution_name` must be registered — e.g. load the ZCML of a package that registers it via `<plone:distribution>`.
+
+Override `distribution_name` and `answers` in your own `conftest.py` to point at your distribution and customize the site:
+
+```python
+import pytest
+
+
+@pytest.fixture(scope="session")
+def distribution_name() -> str:
+    return "my.distribution"
+
+
+@pytest.fixture(scope="session")
+def answers(site_logo: str) -> dict:
+    return {
+        "site_id": "plone-site",
+        "title": "My Site",
+        "description": "A site built from my distribution.",
+        "default_language": "en",
+        "portal_timezone": "UTC",
+        "site_logo": site_logo,
+        "setup_content": False,
+    }
+
+
+class TestDistribution:
+    @pytest.fixture(autouse=True)
+    def _setup(self, app):
+        self.app = app
+
+    def test_site_from_distribution(self, create_site, answers):
+        site = create_site(self.app, answers)
+        assert site.getId() == "plone-site"
+        assert site.title == "My Site"
+```
+
 ## Markers
 
 ### @pytest.mark.portal

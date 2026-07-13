@@ -1,0 +1,1 @@
+Added ``plone.distribution`` support: a ``create_site`` fixture that creates a Plone site from a distribution, plus supporting ``distribution_name``, ``answers``, and ``site_logo`` fixtures (all overridable) and ``site_owner_name`` / ``site_owner_password`` fixtures. @ericof
