@@ -9,6 +9,33 @@
 
 <!-- towncrier release notes start -->
 
+## 1.1.0 (2026-07-13)
+
+
+### New features:
+
+- Add Sphinx documentation under `docs/`, structured with Diataxis: a tutorial, four how-to guides, two explanation pages, and a reference. The fixture and API reference is generated from the docstrings by `sphinx-autodoc2`, which analyses the source statically — so it copes with `@pytest.fixture` (which returns a `FixtureFunctionDefinition`, not a function) and with our Markdown docstrings, neither of which `sphinx.ext.autodoc` can handle. Build it with `make docs`. @jensens [#30](https://github.com/plone/pytest-plone/issues/30)
+- Added support for creating content in a distinct container (``_container``) and transitioning it to a workflow state (``_review_state``) via the ``@pytest.mark.portal`` marker. @ericof [#53](https://github.com/plone/pytest-plone/issues/53)
+- Added class-scoped ``app_class`` and ``functional_app_class`` fixtures returning the Zope app root, so accessing the app at class scope no longer requires going through ``portal_class`` and ``aq_parent``. @ericof [#57](https://github.com/plone/pytest-plone/issues/57)
+- Added ``plone.distribution`` support: a ``create_site`` fixture that creates a Plone site from a distribution, plus supporting ``distribution_name``, ``answers``, and ``site_logo`` fixtures (all overridable) and ``site_owner_name`` / ``site_owner_password`` fixtures. @ericof [#58](https://github.com/plone/pytest-plone/issues/58)
+
+
+### Bug fixes:
+
+- `fixtures_factory` now keeps each testing layer set up for the whole session by registering an autouse session fixture per layer. Function-style tests (`def test_x(portal): ...`) previously re-ran the full layer `setUp` — including `applyProfile` — once per test instead of once per session, a silent ~20x performance cliff. Pass `keep_session=False` to restore the previous behavior. @jensens [#49](https://github.com/plone/pytest-plone/issues/49)
+- Fix broken code examples in the fixture docstrings, and add a test that keeps them correct. `setup_tool` was not valid Python (unterminated string literals), `get_fti` asserted `isinstance(fti, IDexterityFTI)` which is always `False` (zope interfaces need `providedBy`), `get_vocabulary` referenced an undefined name `toc`, and `http_request` requested pytest's builtin `request` fixture instead of `http_request`. A further 14 examples used `self` in top-level test functions, which fails with `fixture 'self' not found` when copy-pasted. @jensens [#54](https://github.com/plone/pytest-plone/issues/54)
+
+
+### Internal:
+
+- Fix `make install` (and CI) on Python 3.10: invoke mxdev with its `uv` extra (`uvx --from "mxdev[uv]" mxdev`) so the `tomlkit` dependency required by mxdev's uv hook is available. @jensens 
+- Updated the ``Development Status`` trove classifier to ``5 - Production/Stable``. @ericof 
+
+
+### Tests
+
+- Added regression tests proving ``@pytest.mark.portal`` changes (content, roles, profiles) are undone after each test by the testing layer — including committed functional-layer content served over real HTTP, which ``FunctionalTesting`` discards per test. @ericof [#52](https://github.com/plone/pytest-plone/issues/52)
+
 ## 1.0.0 (2026-05-19)
 
 
