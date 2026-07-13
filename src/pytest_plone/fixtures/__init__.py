@@ -17,9 +17,15 @@ from .base import functional_portal_class
 from .base import http_request
 from .base import portal
 from .base import portal_class
+from .base import site_owner_name
+from .base import site_owner_password
 from .content import create_content
 from .content import get_behaviors
 from .content import get_fti
+from .distribution import answers
+from .distribution import create_site
+from .distribution import distribution_name
+from .distribution import site_logo
 from .env import generate_mo
 from .requests import anon_request
 from .requests import manager_request
@@ -32,12 +38,15 @@ import pytest
 
 __all__ = [
     "anon_request",
+    "answers",
     "app",
     "app_class",
     "apply_profiles",
     "browser_layers",
     "controlpanel_actions",
     "create_content",
+    "create_site",
+    "distribution_name",
     "functional_app",
     "functional_app_class",
     "functional_http_request",
@@ -56,6 +65,9 @@ __all__ = [
     "profile_last_version",
     "request_factory",
     "setup_tool",
+    "site_logo",
+    "site_owner_name",
+    "site_owner_password",
     "uninstalled",
 ]
 

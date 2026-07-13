@@ -40,6 +40,8 @@ dependencies = [
     "plone.browserlayer",
     "plone.dexterity",
     "Products.CMFPlone[test]",
+    "plone.distribution",
+    "plone.exportimport",
     "requests",
     "zope.component",
     "zope.schema",
@@ -53,6 +55,8 @@ test = [
     "towncrier>=23.11.0",
     "zest-releaser[recommended]>=9.1.3",
     "zestreleaser-towncrier>=1.3.0",
+    "plone.app.caching",
+    "plone.volto",
 ]
 
 [project.urls]
