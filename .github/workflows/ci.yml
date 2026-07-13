@@ -66,6 +66,27 @@ jobs:
             echo '| Python Versions | ${{ steps.py-versions.conclusion == 'failure' && '❌' || ' ✅' }} |' >> $GITHUB_STEP_SUMMARY
             echo '| Typing | ${{ steps.typing.conclusion == 'failure' && '❌' || ' ✅' }} |' >> $GITHUB_STEP_SUMMARY
 
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+
+        - name: Checkout
+          uses: actions/checkout@v6
+
+        - name: Install the latest version of uv
+          uses: astral-sh/setup-uv@v8.0.0
+          with:
+            python-version: ${{ env.PYTHON_VERSION }}
+            enable-cache: true
+            cache-dependency-glob: |
+              docs/requirements.txt
+
+        # No `make install` on purpose. sphinx-autodoc2 analyses the source
+        # statically and never imports the package, so the documentation
+        # builds without Plone. This job takes seconds, not minutes.
+        - name: Build documentation
+          run: make docs
+
   test:
     runs-on: ubuntu-latest
     strategy:
