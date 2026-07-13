@@ -13,10 +13,10 @@ def get_vocabulary() -> t.VocabularyGetter:
 
     Example usage:
     ```python
-    def test_vocabulary(self, portal, get_vocabulary):
+    def test_vocabulary(portal, get_vocabulary):
         voc = get_vocabulary("plone.app.vocabularies.SupportedContentLanguages", portal)
         assert "en" in voc
-        term = toc.getTerm("en")
+        term = voc.getTerm("en")
         assert term.title == "English"
     ```
     """
