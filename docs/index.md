@@ -9,7 +9,7 @@ myst:
 
 # pytest-plone
 
-`pytest-plone` is a [pytest](https://docs.pytest.org) plugin that provides fixtures and helpers to test [Plone](https://plone.org) add-ons.
+`pytest-plone` is a [pytest](https://docs.pytest.org/en/stable/) plugin that provides fixtures and helpers to test [Plone](https://plone.org) add-ons.
 
 It builds on [zope.pytestlayer](https://github.com/zopefoundation/zope.pytestlayer), turning the `plone.testing` layers you already have into pytest fixtures.
 You write plain function-style tests, and the Plone site arrives as an argument.
