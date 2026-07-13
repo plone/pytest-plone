@@ -27,6 +27,17 @@ Layers stack.
 `PRODUCTS_CMFPLONE_INTEGRATION_TESTING` sits on top of a layer that created the Plone site, which sits on top of one that started Zope.
 Each layer in the chain is set up once, and everything above it reuses the result.
 
+Layers are not something `pytest-plone` invents.
+They come from your add-on: by convention you declare them in a `testing.py` module, building on the fixtures `plone.app.testing` provides, and there you say which ZCML to load and which profile to install.
+`pytest-plone` does not replace any of that — it consumes the layers you already have.
+
+```{seealso}
+The layer machinery itself is documented by the packages that own it:
+
+- [plone.app.testing](https://github.com/plone/plone.app.testing/blob/master/README.rst) — the Plone-specific layers and fixtures, and how to write your own `testing.py`.
+- [plone.testing](https://github.com/plone/plone.testing/blob/master/src/plone/testing/README.rst) — the underlying layer model.
+```
+
 ## How isolation actually works
 
 If the site is built once and shared, why does one test not see another's content?

@@ -3,7 +3,18 @@
 In this tutorial we will take an add-on that has no pytest tests, and give it one.
 By the end you will have a working `conftest.py`, a passing test, and a test that puts content into Plone before it runs.
 
-We assume you have a Plone add-on with `plone.testing` layers — the ones a Plone add-on template gives you — and that its tests currently run, or would run, with `zope.testrunner`.
+## What you need first
+
+You need an add-on with **testing layers**.
+
+A testing layer is the object that builds a Plone site for your tests — it loads your ZCML and installs your profile.
+You declare yours in a `testing.py` module, and an add-on generated from a Plone template already has one.
+It defines two layers, conventionally named something like `MY_ADDON_INTEGRATION_TESTING` and `MY_ADDON_FUNCTIONAL_TESTING`.
+
+Open your `testing.py` now and find those two names.
+We will use them in a moment.
+
+If your add-on has no `testing.py`, write one before continuing — [plone.app.testing](https://github.com/plone/plone.app.testing/blob/master/README.rst) explains how.
 
 ## Install the plugin
 

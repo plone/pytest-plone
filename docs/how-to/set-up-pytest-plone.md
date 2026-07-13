@@ -1,6 +1,22 @@
 # How to set up pytest-plone in your add-on
 
-This guide shows you how to add `pytest-plone` to an existing Plone add-on that has `plone.testing` layers.
+This guide shows you how to add `pytest-plone` to an existing Plone add-on.
+
+## Before you start
+
+You need testing layers.
+
+A testing layer is the object that builds a Plone site for your tests: it loads your ZCML, installs your GenericSetup profile, and hands the result to each test.
+By convention you declare yours in a `testing.py` module in your package, building on the fixtures `plone.app.testing` provides.
+
+`pytest-plone` does not replace any of this.
+It takes the layers you already have and turns them into pytest fixtures.
+If your add-on has no `testing.py` yet, write one first — the packages that own the layer machinery document how:
+
+```{seealso}
+- [plone.app.testing](https://github.com/plone/plone.app.testing/blob/master/README.rst) — the Plone-specific layers and fixtures, and how to write your own `testing.py`.
+- [plone.testing](https://github.com/plone/plone.testing/blob/master/src/plone/testing/README.rst) — the underlying layer model.
+```
 
 ## Install the package
 
