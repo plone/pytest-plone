@@ -54,6 +54,7 @@ jobs:
         env:
           PLONE_VERSION: ${{ inputs.plone-version }}
           PYTHON_VERSION: ${{ inputs.python-version }}
+          CI_DOCS: "1"
         run: make install
 
       - name: Build HTML documentation

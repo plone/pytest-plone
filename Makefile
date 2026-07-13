@@ -77,7 +77,13 @@ config: instance/etc/zope.ini
 requirements-mxdev.txt: pyproject.toml mx.ini ## Generate constraints file
 	@echo "$(GREEN)==> Generate constraints file$(RESET)"
 	@echo '-c https://dist.plone.org/release/$(PLONE_VERSION)/constraints.txt' > requirements.txt
+	@# In CI only, drop the docs extra unless CI_DOCS is set, so test/coverage
+	@# jobs skip the heavy documentation dependencies. mx.ini is edited only for
+	@# the mxdev run and restored right after, so the working tree stays clean.
+	@# Local runs (CI unset) are never touched.
+	@if [ -n "$(CI)" ] && [ -z "$(CI_DOCS)" ]; then sed -i.bak 's/\[test,docs\]/[test]/' mx.ini; fi
 	@uvx --from "mxdev[uv]" mxdev -c mx.ini
+	@if [ -f mx.ini.bak ]; then mv mx.ini.bak mx.ini; fi
 	@# plone-stubs is not on PyPI; install from git only on Python >= 3.12.
 	@# The marker has to live here (not in pyproject.toml or mx.ini), since
 	@# uv pip install does not honor [tool.uv.sources] when managed = false,
