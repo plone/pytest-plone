@@ -20,10 +20,12 @@ For what the two layers mean and when to choose which, see {doc}`/explanation/la
 | --- | --- | --- |
 | `app` | Function | `integration` |
 | `portal` | Function | `integration` |
+| `app_class` | Class | `integration_class` |
 | `portal_class` | Class | `integration_class` |
 | `http_request` | Function | `integration` |
 | `functional_app` | Function | `functional` |
 | `functional_portal` | Function | `functional` |
+| `functional_app_class` | Class | `functional_class` |
 | `functional_portal_class` | Class | `functional_class` |
 | `functional_http_request` | Function | `functional` |
 | `request_factory` | Function | `functional_portal` |
@@ -41,6 +43,12 @@ For what the two layers mean and when to choose which, see {doc}`/explanation/la
 | `create_content` | Session |—|
 | `grant_roles` | Session |—|
 | `get_vocabulary` | Session |—|
+| `create_site` | Session | `distribution_name`, `site_owner_name` |
+| `distribution_name` | Session |—|
+| `answers` | Session | `site_logo` |
+| `site_logo` | Session |—|
+| `site_owner_name` | Session |—|
+| `site_owner_password` | Session |—|
 | `generate_mo` | Session |—|
 
 ## Portal and app
@@ -53,11 +61,18 @@ Use them for REST API and browser tests.
 The class-scoped variants share one portal across every test method in a class.
 They honor `@pytest.mark.portal` only when it is applied to the **class**; a class-scoped fixture cannot see method-level markers.
 
+The `app_class` and `functional_app_class` fixtures return the Zope root at class scope.
+Each one drives the single per-class setup and teardown that its portal counterpart depends on, so a class can ask for both the app and the portal without setting the layer up twice.
+
 ```{autodoc2-object} pytest_plone.fixtures.base.app
 render_plugin = "myst"
 ```
 
 ```{autodoc2-object} pytest_plone.fixtures.base.portal
+render_plugin = "myst"
+```
+
+```{autodoc2-object} pytest_plone.fixtures.base.app_class
 render_plugin = "myst"
 ```
 
@@ -70,6 +85,10 @@ render_plugin = "myst"
 ```
 
 ```{autodoc2-object} pytest_plone.fixtures.base.functional_portal
+render_plugin = "myst"
+```
+
+```{autodoc2-object} pytest_plone.fixtures.base.functional_app_class
 render_plugin = "myst"
 ```
 
@@ -167,6 +186,41 @@ render_plugin = "myst"
 ## Vocabularies
 
 ```{autodoc2-object} pytest_plone.fixtures.vocabularies.get_vocabulary
+render_plugin = "myst"
+```
+
+## Distribution
+
+Create a Plone site from a `plone.distribution` distribution, the way a real deployment does.
+
+`create_site` returns a callable that builds a **new** site in a Zope app from the distribution named by `distribution_name`, using the answers from `answers`, and sets it as the current site.
+It first deletes any existing site with the same id, so each call starts from a clean state.
+The distribution named by `distribution_name` must be registered, for example by loading the ZCML of a package that declares it with a `plone:distribution` directive.
+
+The `distribution_name`, `answers`, and `site_logo` fixtures are meant to be **overridden** in your own `conftest.py` to point at your distribution and customize the site.
+`site_owner_name` and `site_owner_password` expose the site owner credentials, so tests and fixtures can depend on them instead of importing the constants.
+
+```{autodoc2-object} pytest_plone.fixtures.distribution.create_site
+render_plugin = "myst"
+```
+
+```{autodoc2-object} pytest_plone.fixtures.distribution.distribution_name
+render_plugin = "myst"
+```
+
+```{autodoc2-object} pytest_plone.fixtures.distribution.answers
+render_plugin = "myst"
+```
+
+```{autodoc2-object} pytest_plone.fixtures.distribution.site_logo
+render_plugin = "myst"
+```
+
+```{autodoc2-object} pytest_plone.fixtures.base.site_owner_name
+render_plugin = "myst"
+```
+
+```{autodoc2-object} pytest_plone.fixtures.base.site_owner_password
 render_plugin = "myst"
 ```
 
