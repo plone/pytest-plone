@@ -47,3 +47,4 @@ requirements*.txt
 
 # Local Claude context (not for sharing)
 .claude/*.local.*
+.venv-docs/

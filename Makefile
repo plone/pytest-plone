@@ -139,6 +139,34 @@ test-coverage: $(VENV_FOLDER) ## run tests with coverage
 	@uv run pytest -n0 --cov=pytest_plone --cov-report term-missing
 
 ############################################
+# Documentation
+############################################
+# sphinx-autodoc2 analyses the source statically and never imports the package,
+# so building the docs needs neither Plone nor the test environment. It gets its
+# own small virtualenv and takes seconds rather than minutes.
+DOCS_VENV=$(BACKEND_FOLDER)/.venv-docs
+
+$(DOCS_VENV): docs/requirements.txt ## Install the documentation environment
+	@echo "$(GREEN)==> Install documentation environment$(RESET)"
+	@if [[ -d "$(DOCS_VENV)" ]]; then echo "$(YELLOW)==> Environment already exists at $(DOCS_VENV)$(RESET)"; else uv venv $(DOCS_VENV); fi
+	@VIRTUAL_ENV=$(DOCS_VENV) uv pip install -r docs/requirements.txt
+
+.PHONY: docs
+docs: $(DOCS_VENV) ## Build the documentation (warnings are errors)
+	@echo "$(GREEN)==> Build documentation$(RESET)"
+	@$(DOCS_VENV)/bin/python -m sphinx -W --keep-going -b html docs docs/_build/html
+
+.PHONY: docs-linkcheck
+docs-linkcheck: $(DOCS_VENV) ## Check that all links in the documentation resolve
+	@echo "$(GREEN)==> Check documentation links$(RESET)"
+	@$(DOCS_VENV)/bin/python -m sphinx -b linkcheck docs docs/_build/linkcheck
+
+.PHONY: docs-clean
+docs-clean: ## Remove the built documentation and its environment
+	@echo "$(RED)==> Clean documentation$(RESET)"
+	@rm -rf docs/_build $(DOCS_VENV)
+
+############################################
 # Release
 ############################################
 .PHONY: changelog
