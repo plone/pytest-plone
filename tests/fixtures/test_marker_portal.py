@@ -97,6 +97,115 @@ class TestPortalMarkerContent:
 
 
 @pytest.mark.no_cover
+class TestPortalMarkerContentContainer:
+    """Portal marker creates content in a distinct container via ``_container``."""
+
+    def test_create_in_container(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+
+            @pytest.mark.portal(
+                content=[
+                    {"type": "Folder", "id": "folder", "title": "Folder"},
+                    {
+                        "type": "Document",
+                        "id": "doc1",
+                        "title": "Nested",
+                        "_container": "/folder",
+                    },
+                ],
+            )
+            def test_document_in_folder(portal):
+                assert "folder" in portal
+                assert "doc1" not in portal
+                assert "doc1" in portal["folder"]
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+
+@pytest.mark.no_cover
+class TestPortalMarkerContentReviewState:
+    """Portal marker transitions content via ``_review_state``."""
+
+    def test_create_in_review_state(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            from plone import api
+
+            @pytest.mark.portal(
+                content=[
+                    {
+                        "type": "Document",
+                        "id": "doc1",
+                        "title": "Published",
+                        "_review_state": "published",
+                    },
+                ],
+            )
+            def test_document_published(portal):
+                assert api.content.get_state(obj=portal["doc1"]) == "published"
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+    def test_content_is_catalogued(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            from plone import api
+
+            @pytest.mark.portal(
+                content=[
+                    {
+                        "type": "Document",
+                        "id": "doc1",
+                        "title": "Published",
+                        "_review_state": "published",
+                    },
+                ],
+            )
+            def test_document_found_in_catalog(portal):
+                results = api.content.find(review_state="published", id="doc1")
+                assert len(results) == 1
+                assert results[0].getPath().endswith("/doc1")
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+    def test_container_and_review_state_combined(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            from plone import api
+
+            @pytest.mark.portal(
+                content=[
+                    {"type": "Folder", "id": "folder", "title": "Folder"},
+                    {
+                        "type": "Document",
+                        "id": "doc1",
+                        "title": "Nested Published",
+                        "_container": "/folder",
+                        "_review_state": "published",
+                    },
+                ],
+            )
+            def test_nested_published(portal):
+                doc = portal["folder"]["doc1"]
+                assert api.content.get_state(obj=doc) == "published"
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+
+@pytest.mark.no_cover
 class TestPortalMarkerProfiles:
     """Portal marker applies GenericSetup profiles."""
 

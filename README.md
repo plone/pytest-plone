@@ -597,6 +597,41 @@ def test_something(portal):
 
 Tests without the marker see no behavior change — fully backwards-compatible.
 
+#### Content specifications
+
+Each dict in `content` is passed as keyword arguments to `plone.api.content.create`. Two keys receive special handling and are consumed before the call:
+
+| Key | Description |
+| --- | --- |
+| `_container` | Path to the container the item is created in, relative to the site root (e.g. `"/folder"`). Defaults to the portal when absent. |
+| `_review_state` | Target workflow state; the item is transitioned there after creation via `plone.api.content.transition`. |
+
+Items are created in list order, so a container listed earlier can be referenced by a later item's `_container`:
+
+```python
+import pytest
+
+
+@pytest.mark.portal(
+    content=[
+        {"type": "Folder", "id": "folder", "title": "Folder"},
+        {
+            "type": "Document",
+            "id": "doc1",
+            "title": "Nested & published",
+            "_container": "/folder",
+            "_review_state": "published",
+        },
+    ],
+)
+def test_nested_content(portal):
+    """The document lives in the folder and is published."""
+    from plone import api
+
+    doc = portal["folder"]["doc1"]
+    assert api.content.get_state(obj=doc) == "published"
+```
+
 ## Plugin Development
 
 You need a working `python` environment (system, virtualenv, pyenv, etc) version 3.8 or superior.
