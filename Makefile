@@ -41,6 +41,13 @@ VENV_FOLDER=$(BACKEND_FOLDER)/.venv
 export VIRTUAL_ENV=$(VENV_FOLDER)
 BIN_FOLDER=$(VENV_FOLDER)/bin
 
+# Docs configuration
+DOCS_SPHINXOPTS      ?=
+DOCS_DIR=$(BACKEND_FOLDER)/docs
+DOCS_BUILDDIR=$(DOCS_DIR)/_build
+DOCS_VALEFILES       := $(shell find $(DOCS_DIR) -type f -name "*.md" -not -path "$(DOCS_BUILDDIR)/*" -print)
+DOCS_VALEOPTS        ?=
+
 # Environment variables to be exported
 export PYTHONWARNINGS := ignore
 export DOCKER_BUILDKIT := 1
@@ -70,7 +77,13 @@ config: instance/etc/zope.ini
 requirements-mxdev.txt: pyproject.toml mx.ini ## Generate constraints file
 	@echo "$(GREEN)==> Generate constraints file$(RESET)"
 	@echo '-c https://dist.plone.org/release/$(PLONE_VERSION)/constraints.txt' > requirements.txt
+	@# In CI only, drop the docs extra unless CI_DOCS is set, so test/coverage
+	@# jobs skip the heavy documentation dependencies. mx.ini is edited only for
+	@# the mxdev run and restored right after, so the working tree stays clean.
+	@# Local runs (CI unset) are never touched.
+	@if [ -n "$(CI)" ] && [ -z "$(CI_DOCS)" ]; then sed -i.bak 's/\[test,docs\]/[test]/' mx.ini; fi
 	@uvx --from "mxdev[uv]" mxdev -c mx.ini
+	@if [ -f mx.ini.bak ]; then mv mx.ini.bak mx.ini; fi
 	@# plone-stubs is not on PyPI; install from git only on Python >= 3.12.
 	@# The marker has to live here (not in pyproject.toml or mx.ini), since
 	@# uv pip install does not honor [tool.uv.sources] when managed = false,
@@ -137,6 +150,40 @@ test: $(VENV_FOLDER) ## run tests
 .PHONY: test-coverage
 test-coverage: $(VENV_FOLDER) ## run tests with coverage
 	@uv run pytest -n0 --cov=pytest_plone --cov-report term-missing
+
+############################################
+# Documentation
+############################################
+# sphinx-autodoc2 analyses the source statically and never imports the package,
+# so building the docs needs neither Plone nor the test environment. It gets its
+# own small virtualenv and takes seconds rather than minutes.
+.PHONY: docs
+docs: $(VENV_FOLDER) ## Build the documentation (warnings are errors)
+	@echo "$(GREEN)==> Build documentation$(RESET)"
+	@$(VENV_FOLDER)/bin/sphinx-build -W --keep-going -b html $(DOCS_DIR) "$(DOCS_BUILDDIR)/html"
+
+.PHONY: docs-livehtml
+docs-livehtml: $(VENV_FOLDER)  ## Rebuild Sphinx documentation on changes, with live-reload in the browser
+	@$(VENV_FOLDER)/bin/sphinx-autobuild \
+		--ignore "*.swp" \
+		--port 8050 \
+		-b html $(DOCS_DIR) "$(DOCS_BUILDDIR)/html" $(DOCS_SPHINXOPTS)
+
+.PHONY: docs-linkcheck
+docs-linkcheck: $(VENV_FOLDER) ## Check that all links in the documentation resolve
+	@echo "$(GREEN)==> Check documentation links$(RESET)"
+	@$(VENV_FOLDER)/bin/sphinx-build -b linkcheck $(DOCS_DIR) "$(DOCS_BUILDDIR)/linkcheck"
+
+.PHONY: docs-vale
+docs-vale: $(VENV_FOLDER) ## Check the documentation with Vale
+	@echo "$(GREEN)==> Check documentation with Vale$(RESET)"
+	@$(VENV_FOLDER)/bin/vale sync
+	@$(VENV_FOLDER)/bin/vale --no-wrap $(DOCS_VALEOPTS) $(DOCS_VALEFILES)
+
+.PHONY: docs-clean
+docs-clean: ## Remove the built documentation and its environment
+	@echo "$(RED)==> Clean documentation$(RESET)"
+	@rm -rf $(DOCS_BUILDDIR)
 
 ############################################
 # Release

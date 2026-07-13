@@ -1,0 +1,106 @@
+name: Documentation
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
+        default: "3.14"
+      plone-version:
+        required: false
+        type: string
+        default: "6.2-latest"
+      docs-directory:
+        type: string
+        required: false
+        default: "docs"
+      working-directory:
+        type: string
+        required: false
+        default: "."
+      check-links:
+        default: false
+        type: boolean
+      check-vale:
+        default: false
+        type: boolean
+    outputs:
+      url:
+        description: "URL of the deployed documentation"
+        value: ${{ jobs.deploy.outputs.url }}
+jobs:
+  build:
+    name: Documentation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v8.0.0
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache-suffix: ${{ inputs.plone-version }}-${{ inputs.python-version }}
+          enable-cache: true
+          cache-dependency-glob: |
+            pyproject.toml
+            mx.ini
+
+      - name: Install Dependencies
+        shell: bash
+        env:
+          PLONE_VERSION: ${{ inputs.plone-version }}
+          PYTHON_VERSION: ${{ inputs.python-version }}
+          CI_DOCS: "1"
+        run: make install
+
+      - name: Build HTML documentation
+        shell: bash
+        run: |
+          make docs
+
+      - name: Check for broken links
+        if: ${{ inputs.check-links }}
+        shell: bash
+        run: |
+          make docs-linkcheck
+
+      - name: Run vale checks
+        if: ${{ inputs.check-vale }}
+        shell: bash
+        run: |
+          make docs-vale DOCS_VALEOPTS="--minAlertLevel='warning'"
+
+      - name: Upload static files as artifact
+        id: deployment
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ${{ inputs.docs-directory }}/_build/html/
+
+  deploy:
+    name: Deploy to GitHub Pages
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    outputs:
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    needs:
+      - build
+
+    permissions:
+      pages: write
+      id-token: write
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner + deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

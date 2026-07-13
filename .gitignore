@@ -42,8 +42,11 @@ var/
 /venv/
 constraints*.txt
 requirements*.txt
+# ...but the documentation requirements are hand-written and must be committed.
+!docs/requirements.txt
 .coverage*
 .*_cache/
 
 # Local Claude context (not for sharing)
 .claude/*.local.*
+.venv-docs/
