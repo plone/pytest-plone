@@ -35,13 +35,13 @@ For what the two layers mean and when to choose which, see {doc}`/explanation/la
 | `controlpanel_actions` | Function | `portal` |
 | `setup_tool` | Function | `portal` |
 | `profile_last_version` | Function | `setup_tool` |
-| `apply_profiles` | Session | — |
+| `apply_profiles` | Session |—|
 | `get_fti` | Function | `portal` |
 | `get_behaviors` | Function | `get_fti` |
-| `create_content` | Session | — |
-| `grant_roles` | Session | — |
-| `get_vocabulary` | Session | — |
-| `generate_mo` | Session | — |
+| `create_content` | Session |—|
+| `grant_roles` | Session |—|
+| `get_vocabulary` | Session |—|
+| `generate_mo` | Session |—|
 
 ## Portal and app
 
@@ -51,7 +51,7 @@ The `functional_` variants are bound to the functional layer, which uses a real 
 Use them for REST API and browser tests.
 
 The class-scoped variants share one portal across every test method in a class.
-They honor `@pytest.mark.portal` only when it is applied to the **class** — a class-scoped fixture cannot see method-level markers.
+They honor `@pytest.mark.portal` only when it is applied to the **class**; a class-scoped fixture cannot see method-level markers.
 
 ```{autodoc2-object} pytest_plone.fixtures.base.app
 render_plugin = "myst"

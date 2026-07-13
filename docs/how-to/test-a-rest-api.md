@@ -3,7 +3,7 @@
 This guide shows you how to test a `plone.restapi` service with real HTTP requests.
 
 REST API tests need the **functional** layer.
-A real request arrives over the network in a different transaction, so it cannot see anything your test has not committed — which is exactly what the integration layer never does.
+A real request arrives over the network in a different transaction, so it cannot see anything your test has not committed—which is exactly what the integration layer never does.
 
 ## Make an anonymous request
 
@@ -79,7 +79,7 @@ It is what builds the portal the marker acts on, and what the session's base URL
 
 ## Share a portal across a REST API suite
 
-REST API suites are usually read-only, which makes them a good fit for the class-scoped fixture — one portal, built once, for the whole class.
+REST API suites are usually read-only, which makes them a good fit for the class-scoped fixture—one portal, built once, for the whole class.
 
 ```python
 import pytest

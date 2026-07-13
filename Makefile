@@ -45,7 +45,7 @@ BIN_FOLDER=$(VENV_FOLDER)/bin
 DOCS_SPHINXOPTS      ?=
 DOCS_DIR=$(BACKEND_FOLDER)/docs
 DOCS_BUILDDIR=$(DOCS_DIR)/_build
-DOCS_VALEFILES       := $(shell find $(DOCS_DIR) -type f -name "*.md" -print)
+DOCS_VALEFILES       := $(shell find $(DOCS_DIR) -type f -name "*.md" -not -path "$(DOCS_BUILDDIR)/*" -print)
 DOCS_VALEOPTS        ?=
 
 # Environment variables to be exported

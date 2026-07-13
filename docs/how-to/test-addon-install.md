@@ -2,7 +2,7 @@
 
 This guide shows you how to write the canonical setup suite for a Plone add-on: the add-on installs, brings its pieces with it, and removes them again cleanly.
 
-It assumes you have a `package_name` fixture — see {doc}`set-up-pytest-plone`.
+It assumes you have a `package_name` fixture—see {doc}`set-up-pytest-plone`.
 
 ## Check the product is installed
 

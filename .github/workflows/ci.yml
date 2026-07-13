@@ -79,7 +79,7 @@ jobs:
       docs-directory: "docs"
       working-directory: "."
       check-links: false
-      check-vale: false
+      check-vale: true
 
   test:
     runs-on: ubuntu-latest

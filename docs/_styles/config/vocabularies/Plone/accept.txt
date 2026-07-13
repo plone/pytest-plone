@@ -1,6 +1,11 @@
 `plone.api`
 `plone.restapi`
 `plone.volto`
+pytest-plone
+plone.app.testing
+plone.testing
+plone.distribution
+zope.pytestlayer
 accessor
 APIs
 auditable

@@ -16,7 +16,7 @@ Read these away from the keyboard.
 :   Why a project whose core tests with `unittest` would reach for pytest, and what that costs.
 
 {doc}`layers-scopes-and-isolation`
-:   What a testing layer is, how it becomes a pytest fixture, how isolation really works — and the performance trap that lurks in the seam between the two models.
+:   What a testing layer is, how it becomes a pytest fixture, how isolation really works—and the performance trap that lurks in the seam between the two models.
 
 ```{toctree}
 :hidden:

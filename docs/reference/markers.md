@@ -19,7 +19,7 @@ It accepts three keyword arguments, all optional:
 
 `profiles`
 :   A list of GenericSetup profile identifiers to apply.
-    Both `"my.addon:default"` and the full `"profile-my.addon:default"` form work — the `profile-` prefix is added when missing.
+    Both `"my.addon:default"` and the full `"profile-my.addon:default"` form work—the `profile-` prefix is added when missing.
 
 `content`
 :   A list of dictionaries.

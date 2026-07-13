@@ -7,14 +7,14 @@ By the end you will have a working `conftest.py`, a passing test, and a test tha
 
 You need an add-on with **testing layers**.
 
-A testing layer is the object that builds a Plone site for your tests — it loads your ZCML and installs your profile.
+A testing layer is the object that builds a Plone site for your tests—it loads your ZCML and installs your profile.
 You declare yours in a `testing.py` module, and an add-on generated from a Plone template already has one.
 It defines two layers, conventionally named something like `MY_ADDON_INTEGRATION_TESTING` and `MY_ADDON_FUNCTIONAL_TESTING`.
 
 Open your `testing.py` now and find those two names.
 We will use them in a moment.
 
-If your add-on has no `testing.py`, write one before continuing — [plone.app.testing](https://github.com/plone/plone.app.testing/blob/master/README.rst) explains how.
+If your add-on has no `testing.py`, write one before continuing; [`plone.app.testing`](https://github.com/plone/plone.app.testing/blob/master/README.rst) explains how.
 
 ## Install the plugin
 
@@ -84,7 +84,7 @@ tests/test_first.py .                                              [100%]
 ```
 
 The first run takes a few seconds, because Plone has to be set up.
-Run it again and notice that it does not get slower — the site is built once and kept for the whole session.
+Run it again and notice that it does not get slower—the site is built once and kept for the whole session.
 
 ## Ask for content
 
@@ -135,6 +135,6 @@ Everything else `pytest-plone` offers is more fixtures of the same shape.
 
 ## Where to go next
 
-- {doc}`/how-to/test-addon-install` — the suite every add-on should have.
-- {doc}`/reference/fixtures` — the full catalog of what you can ask for.
-- {doc}`/explanation/layers-scopes-and-isolation` — how the isolation you just saw actually works.
+- {doc}`/how-to/test-addon-install`: the suite every add-on should have.
+- {doc}`/reference/fixtures`: the full catalog of what you can ask for.
+- {doc}`/explanation/layers-scopes-and-isolation`: how the isolation you just saw actually works.

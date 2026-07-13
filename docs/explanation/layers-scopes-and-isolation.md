@@ -10,7 +10,7 @@ myst:
 # About testing layers, scopes, and isolation
 
 Setting up a Plone site is expensive.
-Installing the core profile, registering components, building the catalog — it takes seconds, and seconds multiplied by a test suite is minutes you spend waiting.
+Installing the core profile, registering components, building the catalog—it takes seconds, and seconds multiplied by a test suite is minutes you spend waiting.
 
 Everything in this page follows from that one fact.
 
@@ -29,13 +29,13 @@ Each layer in the chain is set up once, and everything above it reuses the resul
 
 Layers are not something `pytest-plone` invents.
 They come from your add-on: by convention you declare them in a `testing.py` module, building on the fixtures `plone.app.testing` provides, and there you say which ZCML to load and which profile to install.
-`pytest-plone` does not replace any of that — it consumes the layers you already have.
+`pytest-plone` does not replace any of that—it consumes the layers you already have.
 
 ```{seealso}
 The layer machinery itself is documented by the packages that own it:
 
-- [plone.app.testing](https://github.com/plone/plone.app.testing/blob/master/README.rst) — the Plone-specific layers and fixtures, and how to write your own `testing.py`.
-- [plone.testing](https://github.com/plone/plone.testing/blob/master/src/plone/testing/README.rst) — the underlying layer model.
+- [plone.app.testing](https://github.com/plone/plone.app.testing/blob/master/README.rst)—the Plone-specific layers and fixtures, and how to write your own `testing.py`.
+- [plone.testing](https://github.com/plone/plone.testing/blob/master/src/plone/testing/README.rst)—the underlying layer model.
 ```
 
 ## How isolation actually works
@@ -50,7 +50,7 @@ The next test sees the pristine site.
 
 `FunctionalTesting` isolates differently.
 It stacks a `DemoStorage` on top of the database, lets the test commit real transactions, and then throws the whole stacked storage away.
-That is more expensive, and it is what you need when a real HTTP request has to reach a real running server — a REST API test cannot see your uncommitted transaction.
+That is more expensive, and it is what you need when a real HTTP request has to reach a real running server—a REST API test cannot see your uncommitted transaction.
 
 The practical rule:
 
@@ -92,7 +92,7 @@ The next test sets it up again.
 From scratch.
 Including `applyProfile`.
 
-The other set, `keep`, is populated from a test item's `.layer` attribute — which only `unittest.TestCase` classes in the classic `zope.testrunner` style carry.
+The other set, `keep`, is populated from a test item's `.layer` attribute—which only `unittest.TestCase` classes in the classic `zope.testrunner` style carry.
 Function-style tests have no `.layer`, so that path never fires for them either.
 
 The result is a full layer teardown and setup around every single test.
@@ -100,7 +100,7 @@ On a real suite this was measured at roughly a twenty-fold slowdown: 275 seconds
 
 It is a quiet failure.
 Nothing errors, nothing warns.
-The tests pass — they are simply slow, and the slowness looks like Plone being Plone.
+The tests pass—they are simply slow, and the slowness looks like Plone being Plone.
 
 The tell is in `pytest --durations=0`: the expensive entries sit in the **setup** phase, not in **call**.
 
@@ -116,7 +116,7 @@ What changes is only that the expensive `setUp` stops repeating.
 This is the right default because function-style tests are the reason this project exists.
 Requiring every consumer to discover the trap and add the fixture themselves would have made a performance cliff the normal experience.
 
-You can opt out with `keep_session=False` — see {doc}`/reference/api`.
+You can opt out with `keep_session=False`; see {doc}`/reference/api`.
 
 ## Choosing a scope for your own fixtures
 
@@ -125,7 +125,7 @@ The same economics apply to fixtures you write.
 Use **function** scope by default.
 It is the safe choice, and for anything cheap the cost is irrelevant.
 
-Reach for **class** scope when setup is expensive and a group of tests can share the result — a REST API suite that needs a portal with content, for example.
+Reach for **class** scope when setup is expensive and a group of tests can share the result—a REST API suite that needs a portal with content, for example.
 Note what you give up: tests in the class are no longer independent, and state leaks from one method to the next.
 Sometimes that is exactly what you want, and sometimes it is a bug that only appears when someone runs the tests in a different order.
 
@@ -151,7 +151,7 @@ def my_portal(functional_class):
 That raises `KeyError: 'portal'`.
 
 The layer's `portal` key is not an attribute of the layer.
-It is set in `testSetUp`, as part of the per-test lifecycle — and `zope.pytestlayer` invokes `testSetUp` **only for the function-scoped fixture**.
+It is set in `testSetUp`, as part of the per-test lifecycle—and `zope.pytestlayer` invokes `testSetUp` **only for the function-scoped fixture**.
 At class scope, that never runs.
 The key does not exist yet, so the lookup fails.
 

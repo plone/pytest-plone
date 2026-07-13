@@ -1,4 +1,4 @@
-# How to set up pytest-plone in your add-on
+# How to set up `pytest-plone` in your add-on
 
 This guide shows you how to add `pytest-plone` to an existing Plone add-on.
 
@@ -11,11 +11,11 @@ By convention you declare yours in a `testing.py` module in your package, buildi
 
 `pytest-plone` does not replace any of this.
 It takes the layers you already have and turns them into pytest fixtures.
-If your add-on has no `testing.py` yet, write one first — the packages that own the layer machinery document how:
+If your add-on has no `testing.py` yet, write one first—the packages that own the layer machinery document how:
 
 ```{seealso}
-- [plone.app.testing](https://github.com/plone/plone.app.testing/blob/master/README.rst) — the Plone-specific layers and fixtures, and how to write your own `testing.py`.
-- [plone.testing](https://github.com/plone/plone.testing/blob/master/src/plone/testing/README.rst) — the underlying layer model.
+- [plone.app.testing](https://github.com/plone/plone.app.testing/blob/master/README.rst)—the Plone-specific layers and fixtures, and how to write your own `testing.py`.
+- [plone.testing](https://github.com/plone/plone.testing/blob/master/src/plone/testing/README.rst)—the underlying layer model.
 ```
 
 ## Install the package
@@ -56,7 +56,7 @@ globals().update(
 
 The prefixes name the generated fixtures.
 With `integration` and `functional` you get `integration`, `integration_class`, `integration_session`, and the three `functional` counterparts.
-Stick to these two names unless you have a reason not to — the fixtures in {doc}`/reference/fixtures` are built on them.
+Stick to these two names unless you have a reason not to—the fixtures in {doc}`/reference/fixtures` are built on them.
 
 ## Write a test
 
@@ -91,6 +91,6 @@ This unlocks [`uninstalled`](/reference/fixtures.md#add-ons), which removes the 
 
 ## Where to go next
 
-- {doc}`test-addon-install` — the canonical install and uninstall suite.
-- {doc}`speed-up-the-test-suite` — if the suite feels slower than it should.
-- {doc}`/reference/fixtures` — everything you can ask for.
+- {doc}`test-addon-install`: the canonical install and uninstall suite.
+- {doc}`speed-up-the-test-suite`: if the suite feels slower than it should.
+- {doc}`/reference/fixtures`: everything you can ask for.

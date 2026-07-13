@@ -40,7 +40,7 @@ With the conventional prefixes `integration` and `functional`, that yields:
 | `functional_session` | Session |
 
 The fixtures in {doc}`fixtures` are built on these.
-You rarely request them directly — ask for `portal` rather than `integration`.
+You rarely request them directly—ask for `portal` rather than `integration`.
 
 ### Session-wide layers
 
@@ -49,7 +49,7 @@ This keeps each testing layer set up **once per session** instead of once per te
 
 The default matters.
 Function-style tests depend only on the function- and class-scoped fixtures, never on the session fixture.
-Without the autouse fixture, `zope.pytestlayer` tears the layer down and sets it up again — running a full `applyProfile` — around *every single test*.
+Without the autouse fixture, `zope.pytestlayer` tears the layer down and sets it up again (running a full `applyProfile`) around *every single test*.
 
 Per-test isolation is unaffected: `IntegrationTesting` still rolls back the transaction after each test.
 

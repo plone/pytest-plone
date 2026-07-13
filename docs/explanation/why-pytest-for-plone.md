@@ -10,7 +10,7 @@ myst:
 # About pytest for Plone
 
 Plone and Zope test themselves with `unittest`, and they have done so for two decades.
-The layer machinery, the test runner, the conventions — all of it grew in that world and works well there.
+The layer machinery, the test runner, the conventions—all of it grew in that world and works well there.
 
 So why does this package exist?
 
@@ -61,7 +61,7 @@ Plone core is tested with `zope.testrunner`. If you are contributing to core, yo
 `pytest-plone` does not ask you to abandon the layers.
 It reuses them.
 
-Your `plone.testing` layers stay exactly as they are — `fixtures_factory` turns them into pytest fixtures, and your tests become functions that ask for a `portal`.
+Your `plone.testing` layers stay exactly as they are; `fixtures_factory` turns them into pytest fixtures, and your tests become functions that ask for a `portal`.
 The expensive, well-tested Plone setup machinery is untouched; only the way tests are written and run changes.
 
 That is the bet this package makes: keep what Plone got right about test setup, and drop what `unittest` got tedious about test authoring.

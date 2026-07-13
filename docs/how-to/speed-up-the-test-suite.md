@@ -20,7 +20,7 @@ pytest reports `setup`, `call`, and `teardown` separately, and which one dominat
 
 If the costly entries are all in `setup` and each costs roughly the same couple of seconds, the testing layer is being torn down and rebuilt around every test.
 
-This is the single most expensive mistake available to you — it has been measured at a twenty-fold slowdown.
+This is the single most expensive mistake available to you—it has been measured at a twenty-fold slowdown.
 
 `fixtures_factory` prevents it by default by keeping each layer set up for the whole session.
 If you see this symptom, check that you have not disabled that:
@@ -35,7 +35,7 @@ Remove the `keep_session=False`.
 
 ## Share an expensive portal across a test class
 
-When a group of tests needs the same costly setup — a portal with a profile applied and content created — build it once for the class rather than once per test.
+When a group of tests needs the same costly setup—a portal with a profile applied and content created—build it once for the class rather than once per test.
 
 Use the class-scoped fixtures and put the marker on the class:
 

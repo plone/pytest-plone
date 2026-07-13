@@ -7,7 +7,7 @@ myst:
     "keywords": "Plone, pytest, testing, fixtures, add-ons"
 ---
 
-# pytest-plone
+# `pytest-plone`
 
 `pytest-plone` is a [pytest](https://docs.pytest.org/en/stable/) plugin that provides fixtures and helpers to test [Plone](https://plone.org) add-ons.
 
