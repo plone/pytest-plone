@@ -8,7 +8,9 @@ from .addons import profile_last_version
 from .addons import setup_tool
 from .addons import uninstalled
 from .base import app
+from .base import app_class
 from .base import functional_app
+from .base import functional_app_class
 from .base import functional_http_request
 from .base import functional_portal
 from .base import functional_portal_class
@@ -31,11 +33,13 @@ import pytest
 __all__ = [
     "anon_request",
     "app",
+    "app_class",
     "apply_profiles",
     "browser_layers",
     "controlpanel_actions",
     "create_content",
     "functional_app",
+    "functional_app_class",
     "functional_http_request",
     "functional_portal",
     "functional_portal_class",

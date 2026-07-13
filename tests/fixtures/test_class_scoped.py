@@ -88,6 +88,36 @@ class TestPortalClassMarker:
 
 
 @pytest.mark.no_cover
+class TestAppClass:
+    """``app_class`` is the class-scoped Zope app root."""
+
+    def test_app_class_returns_app(self, testdir):
+        testdir.makepyfile(
+            """
+            class TestAppClassBasic:
+                def test_app_title(self, app_class):
+                    assert app_class.title == "Zope"
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+    def test_app_class_and_portal_class_share_lifecycle(self, testdir):
+        """Requesting both must not set the layer up twice."""
+        testdir.makepyfile(
+            """
+            from Acquisition import aq_base
+
+            class TestAppAndPortal:
+                def test_app_is_portal_parent(self, app_class, portal_class):
+                    assert aq_base(app_class) is aq_base(portal_class.aq_parent)
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+
+@pytest.mark.no_cover
 class TestFunctionalPortalClass:
     """``functional_portal_class`` is class-scoped on the functional layer."""
 
@@ -116,6 +146,22 @@ class TestFunctionalPortalClass:
                         username=TEST_USER_ID, obj=functional_portal_class
                     )
                     assert "Manager" in roles
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+
+@pytest.mark.no_cover
+class TestFunctionalAppClass:
+    """``functional_app_class`` is the class-scoped Zope app root."""
+
+    def test_functional_app_class_returns_app(self, testdir):
+        testdir.makepyfile(
+            """
+            class TestFunctionalAppClassBasic:
+                def test_app_title(self, functional_app_class):
+                    assert functional_app_class.title == "Zope"
             """
         )
         result = testdir.runpytest_subprocess()

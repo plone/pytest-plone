@@ -50,14 +50,43 @@ def portal(integration: Layer, request: pytest.FixtureRequest) -> PloneSite:
 
 
 @pytest.fixture(scope="class")
+def app_class(
+    integration_class: Layer,
+) -> Generator[Application, None, None]:
+    """Returns the root of a Zope application for an integration Layer, class-scoped.
+
+    Class-scoped counterpart to :func:`app`. ``zope.pytestlayer`` only invokes
+    ``testSetUp`` for function-scoped fixtures, so this fixture drives the
+    per-class ``testSetUp``/``testTearDown`` lifecycle itself. :func:`portal_class`
+    builds on it, so a test class can request both ``app_class`` and
+    ``portal_class`` without setting the layer up twice.
+
+    Example usage:
+    ```python
+    class TestApp:
+        def test_app(self, app_class):
+            assert app_class.title == "Zope"
+    ```
+    """
+    integration_class.testSetUp()
+    try:
+        yield integration_class["app"]
+    finally:
+        integration_class.testTearDown()
+
+
+@pytest.fixture(scope="class")
 def portal_class(
-    integration_class: Layer, request: pytest.FixtureRequest
-) -> Generator[PloneSite, None, None]:
+    app_class: Application,
+    integration_class: Layer,
+    request: pytest.FixtureRequest,
+) -> PloneSite:
     """Returns the default Plone Site for an integration Layer, class-scoped.
 
     Class-scoped counterpart to :func:`portal`. The same portal instance is
     shared across every test method in the class, so setup runs once per class
-    instead of once per test.
+    instead of once per test. The per-class ``testSetUp``/``testTearDown``
+    lifecycle is driven by :func:`app_class`, on which this fixture depends.
 
     Honors ``@pytest.mark.portal`` **applied at the class level** — method-level
     markers are not visible to a class-scoped fixture and are ignored.
@@ -76,17 +105,9 @@ def portal_class(
             assert "doc1" in portal_class
     ```
     """
-    # ``zope.pytestlayer`` only invokes ``testSetUp`` for function-scoped
-    # fixtures, so the layer's ``portal`` key is unset at class scope. Drive
-    # the per-test lifecycle ourselves so the same portal/transaction spans
-    # every test method in the class.
-    integration_class.testSetUp()
-    try:
-        portal: PloneSite = integration_class["portal"]
-        apply_portal_marker(portal, request)
-        yield portal
-    finally:
-        integration_class.testTearDown()
+    portal: PloneSite = integration_class["portal"]
+    apply_portal_marker(portal, request)
+    return portal
 
 
 @pytest.fixture
@@ -139,14 +160,44 @@ def functional_portal(functional: Layer, request: pytest.FixtureRequest) -> Plon
 
 
 @pytest.fixture(scope="class")
+def functional_app_class(
+    functional_class: Layer,
+) -> Generator[Application, None, None]:
+    """Returns the root of a Zope application for a functional Layer, class-scoped.
+
+    Class-scoped counterpart to :func:`functional_app`. ``zope.pytestlayer`` only
+    invokes ``testSetUp`` for function-scoped fixtures, so this fixture drives the
+    per-class ``testSetUp``/``testTearDown`` lifecycle itself.
+    :func:`functional_portal_class` builds on it, so a test class can request both
+    without setting the layer up twice.
+
+    Example usage:
+    ```python
+    class TestFunctionalApp:
+        def test_app(self, functional_app_class):
+            assert functional_app_class.title == "Zope"
+    ```
+    """
+    functional_class.testSetUp()
+    try:
+        yield functional_class["app"]
+    finally:
+        functional_class.testTearDown()
+
+
+@pytest.fixture(scope="class")
 def functional_portal_class(
-    functional_class: Layer, request: pytest.FixtureRequest
-) -> Generator[PloneSite, None, None]:
+    functional_app_class: Application,
+    functional_class: Layer,
+    request: pytest.FixtureRequest,
+) -> PloneSite:
     """Returns the default Plone Site for a functional Layer, class-scoped.
 
     Class-scoped counterpart to :func:`functional_portal`. The same portal
     instance is shared across every test method in the class — the typical
     pattern for REST API / service test suites that need a persistent portal.
+    The per-class ``testSetUp``/``testTearDown`` lifecycle is driven by
+    :func:`functional_app_class`, on which this fixture depends.
 
     Honors ``@pytest.mark.portal`` **applied at the class level** — method-level
     markers are not visible to a class-scoped fixture and are ignored.
@@ -162,13 +213,9 @@ def functional_portal_class(
             ...
     ```
     """
-    functional_class.testSetUp()
-    try:
-        portal: PloneSite = functional_class["portal"]
-        apply_portal_marker(portal, request)
-        yield portal
-    finally:
-        functional_class.testTearDown()
+    portal: PloneSite = functional_class["portal"]
+    apply_portal_marker(portal, request)
+    return portal
 
 
 @pytest.fixture

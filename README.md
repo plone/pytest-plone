@@ -165,6 +165,22 @@ class TestDocument:
         assert portal_class["doc1"].title == "Doc"
 ```
 
+### app_class
+
+|  |  |
+| --- | --- |
+| Description | Zope root shared across every test method in a class. |
+| Required Fixture | **integration_class** |
+| Scope | **Class** |
+
+Class-scoped counterpart to `app`. Shares the single per-class setup/teardown of `portal_class` (the app is the portal's container), so a class can request both `app_class` and `portal_class` without setting the layer up twice.
+
+```python
+class TestApp:
+    def test_app_root(self, app_class):
+        assert app_class.getPhysicalPath() == ("",)
+```
+
 ### http_request
 
 |  |  |
@@ -237,6 +253,22 @@ import pytest
 class TestRESTService:
     def test_portal_available(self, functional_portal_class):
         assert functional_portal_class.title == "Plone site"
+```
+
+### functional_app_class
+
+|  |  |
+| --- | --- |
+| Description | Zope root on the **functional** testing layer, shared across every test method in a class. |
+| Required Fixture | **functional_class** |
+| Scope | **Class** |
+
+Class-scoped counterpart to `functional_app`. Shares the single per-class setup/teardown of `functional_portal_class`, so a class can request both without setting the layer up twice.
+
+```python
+class TestFunctionalApp:
+    def test_app_root(self, functional_app_class):
+        assert functional_app_class.getPhysicalPath() == ("",)
 ```
 
 ### functional_http_request
@@ -596,6 +628,41 @@ def test_something(portal):
 ```
 
 Tests without the marker see no behavior change — fully backwards-compatible.
+
+#### Content specifications
+
+Each dict in `content` is passed as keyword arguments to `plone.api.content.create`. Two keys receive special handling and are consumed before the call:
+
+| Key | Description |
+| --- | --- |
+| `_container` | Path to the container the item is created in, relative to the site root (e.g. `"/folder"`). Defaults to the portal when absent. |
+| `_review_state` | Target workflow state; the item is transitioned there after creation via `plone.api.content.transition`. |
+
+Items are created in list order, so a container listed earlier can be referenced by a later item's `_container`:
+
+```python
+import pytest
+
+
+@pytest.mark.portal(
+    content=[
+        {"type": "Folder", "id": "folder", "title": "Folder"},
+        {
+            "type": "Document",
+            "id": "doc1",
+            "title": "Nested & published",
+            "_container": "/folder",
+            "_review_state": "published",
+        },
+    ],
+)
+def test_nested_content(portal):
+    """The document lives in the folder and is published."""
+    from plone import api
+
+    doc = portal["folder"]["doc1"]
+    assert api.content.get_state(obj=doc) == "published"
+```
 
 ## Plugin Development
 
