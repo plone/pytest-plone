@@ -276,3 +276,49 @@ class TestPortalMarkerIsolation:
         )
         result = testdir.runpytest_subprocess()
         result.assert_outcomes(passed=2)
+
+    def test_roles_do_not_leak(self, testdir):
+        # Use "Reviewer", NOT "Manager": the Products.CMFPlone test layer grants
+        # the test user "Manager" *globally* by default, so a Manager-based probe
+        # would see it in the second test regardless of the marker and wrongly
+        # look like a leak. "Reviewer" is not a baseline role, so its presence in
+        # the second test would be a genuine leak from the first.
+        testdir.makepyfile(
+            """
+            import pytest
+            from plone import api
+            from plone.app.testing import TEST_USER_ID
+
+            @pytest.mark.portal(roles=["Reviewer"])
+            def test_first(portal):
+                roles = api.user.get_roles(username=TEST_USER_ID, obj=portal)
+                assert "Reviewer" in roles
+
+            def test_second(portal):
+                roles = api.user.get_roles(username=TEST_USER_ID, obj=portal)
+                assert "Reviewer" not in roles
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=2)
+
+    def test_profiles_do_not_leak(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            from plone import api
+
+            PROFILE = "plone.session:default"
+
+            @pytest.mark.portal(profiles=[PROFILE])
+            def test_first(portal):
+                st = api.portal.get_tool("portal_setup")
+                assert st.getLastVersionForProfile(PROFILE) != "unknown"
+
+            def test_second(portal):
+                st = api.portal.get_tool("portal_setup")
+                assert st.getLastVersionForProfile(PROFILE) == "unknown"
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=2)
