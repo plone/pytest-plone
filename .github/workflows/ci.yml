@@ -74,7 +74,7 @@ jobs:
       pages: write
       id-token: write
     with:
-      python-version: "3.14"
+      python-version: "3.12"
       plone-version: "6.2.1"
       docs-directory: "docs"
       working-directory: "."
