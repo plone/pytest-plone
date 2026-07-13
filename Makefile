@@ -41,6 +41,13 @@ VENV_FOLDER=$(BACKEND_FOLDER)/.venv
 export VIRTUAL_ENV=$(VENV_FOLDER)
 BIN_FOLDER=$(VENV_FOLDER)/bin
 
+# Docs configuration
+DOCS_SPHINXOPTS      ?=
+DOCS_DIR=$(BACKEND_FOLDER)/docs
+DOCS_BUILDDIR=$(DOCS_DIR)/_build
+DOCS_VALEFILES       := $(shell find $(DOCS_DIR) -type f -name "*.md" -print)
+DOCS_VALEOPTS        ?=
+
 # Environment variables to be exported
 export PYTHONWARNINGS := ignore
 export DOCKER_BUILDKIT := 1
@@ -144,27 +151,33 @@ test-coverage: $(VENV_FOLDER) ## run tests with coverage
 # sphinx-autodoc2 analyses the source statically and never imports the package,
 # so building the docs needs neither Plone nor the test environment. It gets its
 # own small virtualenv and takes seconds rather than minutes.
-DOCS_VENV=$(BACKEND_FOLDER)/.venv-docs
-
-$(DOCS_VENV): docs/requirements.txt ## Install the documentation environment
-	@echo "$(GREEN)==> Install documentation environment$(RESET)"
-	@if [[ -d "$(DOCS_VENV)" ]]; then echo "$(YELLOW)==> Environment already exists at $(DOCS_VENV)$(RESET)"; else uv venv $(DOCS_VENV); fi
-	@VIRTUAL_ENV=$(DOCS_VENV) uv pip install -r docs/requirements.txt
-
 .PHONY: docs
-docs: $(DOCS_VENV) ## Build the documentation (warnings are errors)
+docs: $(VENV_FOLDER) ## Build the documentation (warnings are errors)
 	@echo "$(GREEN)==> Build documentation$(RESET)"
-	@$(DOCS_VENV)/bin/python -m sphinx -W --keep-going -b html docs docs/_build/html
+	@$(VENV_FOLDER)/bin/sphinx-build -W --keep-going -b html $(DOCS_DIR) "$(DOCS_BUILDDIR)/html"
+
+.PHONY: docs-livehtml
+docs-livehtml: $(VENV_FOLDER)  ## Rebuild Sphinx documentation on changes, with live-reload in the browser
+	@$(VENV_FOLDER)/bin/sphinx-autobuild \
+		--ignore "*.swp" \
+		--port 8050 \
+		-b html $(DOCS_DIR) "$(DOCS_BUILDDIR)/html" $(DOCS_SPHINXOPTS)
 
 .PHONY: docs-linkcheck
-docs-linkcheck: $(DOCS_VENV) ## Check that all links in the documentation resolve
+docs-linkcheck: $(VENV_FOLDER) ## Check that all links in the documentation resolve
 	@echo "$(GREEN)==> Check documentation links$(RESET)"
-	@$(DOCS_VENV)/bin/python -m sphinx -b linkcheck docs docs/_build/linkcheck
+	@$(VENV_FOLDER)/bin/sphinx-build -b linkcheck $(DOCS_DIR) "$(DOCS_BUILDDIR)/linkcheck"
+
+.PHONY: docs-vale
+docs-vale: $(VENV_FOLDER) ## Check the documentation with Vale
+	@echo "$(GREEN)==> Check documentation with Vale$(RESET)"
+	@$(VENV_FOLDER)/bin/vale sync
+	@$(VENV_FOLDER)/bin/vale --no-wrap $(DOCS_VALEOPTS) $(DOCS_VALEFILES)
 
 .PHONY: docs-clean
 docs-clean: ## Remove the built documentation and its environment
 	@echo "$(RED)==> Clean documentation$(RESET)"
-	@rm -rf docs/_build $(DOCS_VENV)
+	@rm -rf $(DOCS_BUILDDIR)
 
 ############################################
 # Release

@@ -15,15 +15,36 @@ Because the analysis is static, building these docs does not import the
 package. No Plone installation is required.
 """
 
+from datetime import datetime
+from packaging.version import Version
+from pytest_plone import __version__
+
+
 project = "pytest-plone"
-copyright = "2026, Plone Foundation"
 author = "Plone Community"
+trademark_name = "plone"
+now = datetime.now()
+year = str(now.year)
+copyright = year  # noQA: A001
+# The version info for the project you're documenting, acts as replacement for
+# |version| and |release|, also used in various other places throughout the
+# built documents.
+#
+# The full version, including alpha/beta/rc tags.
+release = __version__
+# The short X.Y version.
+version = "v" + (Version(str(release)).base_version)
+
+templates_path = ["_templates"]
 
 extensions = [
+    "notfound.extension",
     "autodoc2",
     "myst_parser",
     "sphinx_copybutton",
     "sphinx_design",
+    "sphinx_sitemap",
+    "sphinxext.opengraph",
 ]
 
 # -- autodoc2 ---------------------------------------------------------------
@@ -64,6 +85,8 @@ myst_heading_anchors = 3
 # -- Intersphinx-free external links ----------------------------------------
 
 linkcheck_ignore = [
+    r"http://0.0.0.0",
+    r"http://127.0.0.1",
     # Anchors on GitHub are generated client-side.
     r"https://github\.com/.*#.*",
 ]
@@ -71,6 +94,9 @@ linkcheck_ignore = [
 # -- HTML output ------------------------------------------------------------
 
 html_theme = "plone_sphinx_theme"
+
+html_logo = "_static/logo.svg"
+html_favicon = "_static/favicon.ico"
 
 html_theme_options = {
     "icon_links": [
@@ -106,3 +132,20 @@ html_sidebars = {
         "sbt-sidebar-nav",
     ]
 }
+
+html_title = f"{project} v{release}"
+
+html_extra_path = [
+    "robots.txt",
+]
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = [
+    "_static",
+]
+
+html_baseurl = "https://plone.github.io/pytest-plone"
+sitemap_url_scheme = "{link}"
+sitemap_filename = "sitemap-custom.xml"

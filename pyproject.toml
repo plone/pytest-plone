@@ -58,6 +58,19 @@ test = [
     "plone.app.caching",
     "plone.volto",
 ]
+docs = [
+    "myst-parser[linkify]",
+    "plone-sphinx-theme",
+    "sphinx-autobuild",
+    "sphinx-autodoc2",
+    "sphinx-copybutton",
+    "sphinx-design",
+    "sphinx-notfound-page",
+    "sphinx-sitemap",
+    "sphinx",
+    "sphinxext-opengraph",
+    "vale",
+]
 
 [project.urls]
 Homepage = "https://github.com/plone/pytest-plone"
