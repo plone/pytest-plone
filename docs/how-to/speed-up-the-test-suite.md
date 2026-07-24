@@ -26,7 +26,7 @@ This is the single most expensive mistake available to you—it has been measure
 If you see this symptom, check that you have not disabled that:
 
 ```python
-fixtures_factory(layers, keep_session=False)   # <- this reintroduces the problem
+fixtures_factory(layers, keep_session=False)  # <- this reintroduces the problem
 ```
 
 Remove the `keep_session=False`.

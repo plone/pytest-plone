@@ -1,0 +1,1 @@
+Reformat the Python code blocks in the docs and README with the current ``ruff``, which now formats fenced code inside Markdown. Keeps the unpinned lint CI green. @jensens

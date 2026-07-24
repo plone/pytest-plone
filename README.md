@@ -44,12 +44,10 @@ pytest_plugins = ["pytest_plone"]
 
 
 globals().update(
-    fixtures_factory(
-        (
-            (MY_ADDON_FUNCTIONAL_TESTING, "functional"),
-            (MY_ADDON_INTEGRATION_TESTING, "integration"),
-        )
-    )
+    fixtures_factory((
+        (MY_ADDON_FUNCTIONAL_TESTING, "functional"),
+        (MY_ADDON_INTEGRATION_TESTING, "integration"),
+    ))
 )
 ```
 
