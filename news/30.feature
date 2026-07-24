@@ -1,0 +1,1 @@
+Slim down the README to a landing page — intro, install, a short quickstart, and links to the published documentation — instead of duplicating the full fixture catalog. The complete reference now lives at [plone.github.io/pytest-plone](https://plone.github.io/pytest-plone/), removing the double maintenance between docstrings and README. @jensens
