@@ -1,0 +1,1 @@
+Move `dependabot.yml` from the repository root into `.github/`, which is the only path GitHub reads it from. The config declared a weekly `github-actions` check but had never run — no Dependabot pull request has ever been opened on this repository, while sibling repos that keep the file in `.github/` get them routinely. @kunalKumar-13
