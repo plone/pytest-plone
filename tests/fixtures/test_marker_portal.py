@@ -206,6 +206,91 @@ class TestPortalMarkerContentReviewState:
 
 
 @pytest.mark.no_cover
+class TestPortalMarkerContentIndexes:
+    """Marker content is applied to the catalog indexes, not just queued.
+
+    Catalog *queries* flush the pending indexing queue themselves, so they
+    hide the problem. These tests read an index directly, which does not.
+    """
+
+    def test_unique_values_for_sees_every_item(self, testdir):
+        # Before the fix this returned ["alpha", "beta"]: the last item
+        # created was still queued when the test body ran.
+        testdir.makepyfile(
+            """
+            import pytest
+            from plone import api
+
+            CONTENT = [
+                {"type": "Document", "id": "doc-1", "title": "Doc 1",
+                 "subject": ("alpha",)},
+                {"type": "Document", "id": "doc-2", "title": "Doc 2",
+                 "subject": ("beta",)},
+                {"type": "Document", "id": "doc-3", "title": "Doc 3",
+                 "subject": ("gamma",)},
+            ]
+
+            @pytest.mark.portal(content=CONTENT)
+            def test_unique_values(portal):
+                catalog = api.portal.get_tool("portal_catalog")
+                got = sorted(catalog.uniqueValuesFor("Subject"))
+                assert got == ["alpha", "beta", "gamma"], got
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+    def test_unique_values_for_sees_content_in_container(self, testdir):
+        testdir.makepyfile(
+            """
+            import pytest
+            from plone import api
+
+            CONTENT = [
+                {"type": "Folder", "id": "folder", "title": "Folder"},
+                {"type": "Document", "id": "doc-1", "title": "Doc 1",
+                 "subject": ("alpha",), "_container": "/folder",
+                 "_review_state": "published"},
+                {"type": "Document", "id": "doc-2", "title": "Doc 2",
+                 "subject": ("beta",), "_container": "/folder"},
+            ]
+
+            @pytest.mark.portal(content=CONTENT)
+            def test_unique_values(portal):
+                catalog = api.portal.get_tool("portal_catalog")
+                got = sorted(catalog.uniqueValuesFor("Subject"))
+                assert got == ["alpha", "beta"], got
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+    def test_create_content_fixture_flushes_too(self, testdir):
+        # The session-scoped ``create_content`` fixture delegates to the same
+        # helper, so it gets the flush as well.
+        testdir.makepyfile(
+            """
+            from plone import api
+
+            CONTENT = [
+                {"type": "Document", "id": "doc-1", "title": "Doc 1",
+                 "subject": ("alpha",)},
+                {"type": "Document", "id": "doc-2", "title": "Doc 2",
+                 "subject": ("beta",)},
+            ]
+
+            def test_unique_values(portal, create_content):
+                create_content(portal, CONTENT)
+                catalog = api.portal.get_tool("portal_catalog")
+                got = sorted(catalog.uniqueValuesFor("Subject"))
+                assert got == ["alpha", "beta"], got
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+
+@pytest.mark.no_cover
 class TestPortalMarkerProfiles:
     """Portal marker applies GenericSetup profiles."""
 
