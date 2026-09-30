@@ -95,6 +95,36 @@ class TestPortalMarkerContent:
         result = testdir.runpytest_subprocess()
         result.assert_outcomes(passed=1)
 
+    def test_content_visible_to_direct_index_reads(self, testdir):
+        """Content is fully indexed, not just findable through a catalog query.
+
+        ``uniqueValuesFor()`` reads an index directly, bypassing the queue
+        flush that ``CatalogTool`` performs on its own search methods. Before
+        the fixture flushed the indexing queue itself, this would come back
+        missing entries for content created by the marker, most often the
+        last item.
+        """
+        testdir.makepyfile(
+            """
+            import pytest
+            from plone import api
+
+            @pytest.mark.portal(
+                content=[
+                    {"type": "Document", "id": "doc1", "title": "Doc 1", "subject": ("alpha",)},
+                    {"type": "Document", "id": "doc2", "title": "Doc 2", "subject": ("beta",)},
+                    {"type": "Document", "id": "doc3", "title": "Doc 3", "subject": ("gamma",)},
+                ],
+            )
+            def test_unique_values_for(portal):
+                catalog = api.portal.get_tool("portal_catalog")
+                values = sorted(catalog.uniqueValuesFor("Subject"))
+                assert values == ["alpha", "beta", "gamma"]
+            """
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
 
 @pytest.mark.no_cover
 class TestPortalMarkerContentContainer:

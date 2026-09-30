@@ -3,6 +3,7 @@
 from plone import api
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import TEST_USER_ID
+from Products.CMFCore.indexing import processQueue
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFPlone.Portal import PloneSite
 from zope.component.hooks import site
@@ -61,10 +62,14 @@ def create_content(portal: PortalContent, content: list[dict]) -> list[PortalCon
         if to_state is not None:
             api.content.transition(obj=item, to_state=to_state)
         items.append(item)
-    # Force a reindex: content created here has been observed to stay stale in
-    # the catalog (not returned by queries) until reindexed explicitly.
-    for item in items:
-        item.reindexObject()
+    # Products.CMFCore.indexing queues index updates per thread and normally
+    # applies them at the transaction boundary. CatalogTool flushes the queue
+    # on its own read paths (searchResults, search, ...), but a direct index
+    # read such as ZCatalog.uniqueValuesFor() bypasses that and sees whatever
+    # is already applied, which is nothing since tests don't cross a
+    # transaction boundary between this fixture and the test body. Flush the
+    # queue explicitly so index reads see the content created here.
+    processQueue()
     return items
 
 
