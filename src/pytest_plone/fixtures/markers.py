@@ -49,6 +49,9 @@ def apply_profiles(portal: PloneSite, profiles: list[str]) -> None:
             if not profile_id.startswith("profile-"):
                 profile_id = f"profile-{profile_id}"
             setup_tool.runAllImportStepsFromProfile(profile_id)
+        # Import steps may create content. The marker flushes again at its
+        # end, but the ``apply_profiles`` fixture calls this directly.
+        flush_indexing_queue()
 
 
 def create_content(portal: PortalContent, content: list[dict]) -> list[PortalContent]:
@@ -63,6 +66,9 @@ def create_content(portal: PortalContent, content: list[dict]) -> list[PortalCon
       (e.g. ``"/folder"``). Defaults to *portal* when absent.
     - ``_review_state``: target workflow state; the created item is transitioned
       to it via :func:`plone.api.content.transition`.
+
+    The indexing queue is flushed before returning; see
+    :func:`flush_indexing_queue`.
 
     :param portal: default container used when a spec omits ``_container``.
     :param content: list of content specifications.

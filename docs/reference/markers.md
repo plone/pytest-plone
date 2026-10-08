@@ -34,6 +34,10 @@ They are applied in that order: profiles, then content, then roles.
 Because roles are granted last, `roles` has no effect on how profiles are applied or content is created; both already run as the site owner.
 After the marker runs, the test body runs as the test user, with only the roles it had plus those in `roles`.
 
+Content created by `content`, or by the import steps of `profiles`, is fully indexed before the test body runs.
+The marker flushes the catalog's indexing queue, which otherwise waits for a transaction boundary that never comes inside a test.
+This matters for reads that go straight to an index, such as `portal_catalog.uniqueValuesFor()` and the vocabularies built on it; catalog queries flush the queue on their own.
+
 ```python
 import pytest
 

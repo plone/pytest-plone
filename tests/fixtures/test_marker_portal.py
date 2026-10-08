@@ -395,6 +395,44 @@ def test_fixture(portal, apply_profiles):
 
 
 @pytest.mark.no_cover
+class TestProfileContentIndexes:
+    """Content created by a profile's import steps is applied to the indexes.
+
+    ``uniqueValuesFor`` reads the index directly, without flushing the
+    indexing queue the way catalog queries do.
+    """
+
+    def test_apply_profiles_fixture(self, testdir):
+        # The marker flushes at its end; the fixture has to flush on its own.
+        testdir.makepyfile(
+            CONTENT_CREATING_PROFILE
+            + """
+
+def test_unique_values(portal, apply_profiles):
+    apply_profiles(portal, ["my.addon:default"])
+    catalog = api.portal.get_tool("portal_catalog")
+    assert "from-profile" in catalog.uniqueValuesFor("Subject")
+"""
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+    def test_marker(self, testdir):
+        testdir.makepyfile(
+            CONTENT_CREATING_PROFILE
+            + """
+
+@pytest.mark.portal(profiles=["my.addon:default"])
+def test_unique_values(portal):
+    catalog = api.portal.get_tool("portal_catalog")
+    assert "from-profile" in catalog.uniqueValuesFor("Subject")
+"""
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+
+@pytest.mark.no_cover
 class TestPortalMarkerCombined:
     """Portal marker supports combining profiles, content, and roles."""
 
