@@ -37,8 +37,13 @@ def apply_profiles(portal: PloneSite, profiles: list[str]) -> None:
     Each entry can be either ``"my.addon:default"`` or the full
     ``"profile-my.addon:default"`` form — the ``profile-`` prefix
     is added automatically when missing.
+
+    The import steps run as the site owner, as
+    :func:`plone.app.testing.helpers.applyProfile` does, so a step that
+    creates content works whatever the roles of the current user. The
+    current user is restored afterwards.
     """
-    with site(portal):
+    with site(portal), api.env.adopt_user(SITE_OWNER_NAME):
         setup_tool = api.portal.get_tool("portal_setup")
         for profile_id in profiles:
             if not profile_id.startswith("profile-"):

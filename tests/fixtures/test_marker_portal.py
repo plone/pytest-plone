@@ -315,6 +315,85 @@ class TestPortalMarkerProfiles:
         result.assert_outcomes(passed=1)
 
 
+# Stands in for an add-on whose import step creates content: running the
+# profile calls ``api.content.create`` as whoever is logged in. The test user
+# is reduced to ``Member`` first, because the ``Products.CMFPlone`` layer
+# grants it ``Manager`` globally, which would hide a missing elevation.
+CONTENT_CREATING_PROFILE = """
+import pytest
+from plone import api
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
+from Products.GenericSetup.tool import SetupTool
+
+
+@pytest.fixture(autouse=True)
+def _member_only(integration):
+    setRoles(integration["portal"], TEST_USER_ID, ["Member"])
+
+
+@pytest.fixture(autouse=True)
+def _import_step_creates_content(monkeypatch):
+    def run_all_import_steps(self, profile_id, **kwargs):
+        api.content.create(
+            container=api.portal.get(),
+            type="Folder",
+            id="things",
+            title="Things",
+            subject=("from-profile",),
+        )
+
+    monkeypatch.setattr(
+        SetupTool, "runAllImportStepsFromProfile", run_all_import_steps
+    )
+"""
+
+
+@pytest.mark.no_cover
+class TestPortalMarkerProfilesSecurity:
+    """Profiles are applied as the site owner, whatever the test user's roles."""
+
+    def test_import_step_creates_content(self, testdir):
+        testdir.makepyfile(
+            CONTENT_CREATING_PROFILE
+            + """
+
+@pytest.mark.portal(profiles=["my.addon:default"])
+def test_container_exists(portal):
+    assert "things" in portal
+"""
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+    def test_import_step_restores_test_user(self, testdir):
+        testdir.makepyfile(
+            CONTENT_CREATING_PROFILE
+            + """
+
+@pytest.mark.portal(profiles=["my.addon:default"])
+def test_runs_as_test_user(portal):
+    assert api.user.get_current().getId() == TEST_USER_ID
+    assert "Manager" not in api.user.get_roles(username=TEST_USER_ID, obj=portal)
+"""
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+    def test_apply_profiles_fixture(self, testdir):
+        testdir.makepyfile(
+            CONTENT_CREATING_PROFILE
+            + """
+
+def test_fixture(portal, apply_profiles):
+    apply_profiles(portal, ["my.addon:default"])
+    assert "things" in portal
+"""
+        )
+        result = testdir.runpytest_subprocess()
+        result.assert_outcomes(passed=1)
+
+
 @pytest.mark.no_cover
 class TestPortalMarkerCombined:
     """Portal marker supports combining profiles, content, and roles."""

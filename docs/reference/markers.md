@@ -20,6 +20,7 @@ It accepts three keyword arguments, all optional:
 `profiles`
 :   A list of GenericSetup profile identifiers to apply.
     Both `"my.addon:default"` and the full `"profile-my.addon:default"` form work—the `profile-` prefix is added when missing.
+    Profiles are applied as the site owner, like `plone.app.testing.applyProfile`, so an import step that creates content works whatever the test user's roles.
 
 `content`
 :   A list of dictionaries.
@@ -30,6 +31,8 @@ It accepts three keyword arguments, all optional:
 :   A list of roles to grant to the default test user on the portal.
 
 They are applied in that order: profiles, then content, then roles.
+Because roles are granted last, `roles` has no effect on how profiles are applied or content is created; both already run as the site owner.
+After the marker runs, the test body runs as the test user, with only the roles it had plus those in `roles`.
 
 ```python
 import pytest
