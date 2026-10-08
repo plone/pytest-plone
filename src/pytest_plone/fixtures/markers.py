@@ -37,13 +37,21 @@ def apply_profiles(portal: PloneSite, profiles: list[str]) -> None:
     Each entry can be either ``"my.addon:default"`` or the full
     ``"profile-my.addon:default"`` form — the ``profile-`` prefix
     is added automatically when missing.
+
+    The import steps run as the site owner, as
+    :func:`plone.app.testing.helpers.applyProfile` does, so a step that
+    creates content works whatever the roles of the current user. The
+    current user is restored afterwards.
     """
-    with site(portal):
+    with site(portal), api.env.adopt_user(SITE_OWNER_NAME):
         setup_tool = api.portal.get_tool("portal_setup")
         for profile_id in profiles:
             if not profile_id.startswith("profile-"):
                 profile_id = f"profile-{profile_id}"
             setup_tool.runAllImportStepsFromProfile(profile_id)
+        # Import steps may create content. The marker flushes again at its
+        # end, but the ``apply_profiles`` fixture calls this directly.
+        flush_indexing_queue()
 
 
 def create_content(portal: PortalContent, content: list[dict]) -> list[PortalContent]:
@@ -58,6 +66,9 @@ def create_content(portal: PortalContent, content: list[dict]) -> list[PortalCon
       (e.g. ``"/folder"``). Defaults to *portal* when absent.
     - ``_review_state``: target workflow state; the created item is transitioned
       to it via :func:`plone.api.content.transition`.
+
+    The indexing queue is flushed before returning; see
+    :func:`flush_indexing_queue`.
 
     :param portal: default container used when a spec omits ``_container``.
     :param content: list of content specifications.

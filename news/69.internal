@@ -1,0 +1,1 @@
+Dependabot pull requests, and pull requests labeled `skip changelog`, now skip the change log check. Dependabot labels its pull requests `dependencies`, `github_actions` and `skip changelog`. @ericof

@@ -1,0 +1,1 @@
+``@pytest.mark.portal(profiles=...)`` and the ``apply_profiles`` fixture now apply profiles as the site owner, like ``plone.app.testing.applyProfile``. An import step that creates content no longer fails with ``Unauthorized`` when the test user lacks the ``Manager`` role. @ericof

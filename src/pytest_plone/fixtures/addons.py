@@ -129,7 +129,7 @@ def profile_last_version(setup_tool: SetupTool) -> t.ProfileVersionGetter:
 
 @pytest.fixture(scope="session")
 def apply_profiles() -> t.ProfilesApplier:
-    """Apply GenericSetup profiles to a Plone site.
+    """Apply GenericSetup profiles to a Plone site as the site owner.
 
     Example usage:
     ```python

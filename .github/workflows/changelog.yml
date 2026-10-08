@@ -11,6 +11,8 @@ env:
 jobs:
   changelog:
     name: "Check for change log entries"
+    # Dependabot pull requests, and those labeled "skip changelog", need no news fragment
+    if: ${{ github.event.pull_request.user.login != 'dependabot[bot]' && !contains(github.event.pull_request.labels.*.name, 'skip changelog') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

@@ -164,6 +164,7 @@ render_plugin = "myst"
 Inspect content types and create content items.
 
 `create_content` is session-scoped and takes the container explicitly, so you can call it against any portal or folder.
+Like `apply_profiles`, it flushes the catalog's indexing queue before returning, so the new items are already in the catalog indexes.
 
 ```{autodoc2-object} pytest_plone.fixtures.content.get_fti
 render_plugin = "myst"
