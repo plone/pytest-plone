@@ -3,6 +3,7 @@
 from plone import api
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import TEST_USER_ID
+from Products.CMFCore.indexing import processQueue
 from Products.CMFCore.PortalContent import PortalContent
 from Products.CMFPlone.Portal import PloneSite
 from zope.component.hooks import site
@@ -11,6 +12,23 @@ import pytest
 
 
 PORTAL_MARKER_NAME: str = "portal"
+
+
+def flush_indexing_queue() -> None:
+    """Apply every pending catalog index operation immediately.
+
+    ``Products.CMFCore.indexing`` queues index, reindex and unindex operations
+    per thread and applies them at the transaction boundary. A test has no
+    transaction boundary between its fixtures and its assertions, so anything
+    still queued is invisible to code that reads an index directly.
+
+    ``CatalogTool`` hides this for catalog *queries* — ``searchResults``,
+    ``unrestrictedSearchResults``, ``search`` and ``getCounter`` all flush the
+    queue themselves. Methods inherited unwrapped from ``ZCatalog``, such as
+    ``uniqueValuesFor()`` and anything built on it (dynamic vocabularies, facet
+    listings), do not, and see stale indexes.
+    """
+    processQueue()
 
 
 def apply_profiles(portal: PloneSite, profiles: list[str]) -> None:
@@ -61,10 +79,10 @@ def create_content(portal: PortalContent, content: list[dict]) -> list[PortalCon
         if to_state is not None:
             api.content.transition(obj=item, to_state=to_state)
         items.append(item)
-    # Force a reindex: content created here has been observed to stay stale in
-    # the catalog (not returned by queries) until reindexed explicitly.
-    for item in items:
-        item.reindexObject()
+    # Apply the queued index operations now. Without this the last item
+    # created is still only queued when the test body runs, so direct index
+    # reads such as ``uniqueValuesFor()`` return a partial result.
+    flush_indexing_queue()
     return items
 
 
@@ -89,3 +107,8 @@ def apply_portal_marker(portal: PloneSite, request: pytest.FixtureRequest) -> No
                 create_content(portal, marker_content)
         if marker_roles:
             grant_roles(portal, marker_roles)
+        # Profiles may create content of their own through their import steps,
+        # and granting roles reindexes ``allowedRolesAndUsers``. Flush once
+        # more so the whole marker is applied to the indexes, not just the
+        # content this module created.
+        flush_indexing_queue()
