@@ -89,6 +89,13 @@ jobs:
     needs:
       - build
 
+    # Queue deployments: Pages refuses a new one while another is in
+    # progress, which happens when merges land close together. A newer
+    # pending run replaces an older one, so the latest commit is deployed.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+
     permissions:
       pages: write
       id-token: write
