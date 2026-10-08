@@ -9,6 +9,28 @@
 
 <!-- towncrier release notes start -->
 
+## 1.1.1 (2026-10-08)
+
+
+### New features:
+
+- Slim down the README to a landing page — intro, install, a short quickstart, and links to the published documentation — instead of duplicating the full fixture catalog. The complete reference now lives at [plone.github.io/pytest-plone](https://plone.github.io/pytest-plone/), removing the double maintenance between docstrings and README. @jensens [#30](https://github.com/plone/pytest-plone/issues/30)
+
+
+### Bug fixes:
+
+- ``@pytest.mark.portal(profiles=...)`` and the ``apply_profiles`` fixture now apply profiles as the site owner, like ``plone.app.testing.applyProfile``. An import step that creates content no longer fails with ``Unauthorized`` when the test user lacks the ``Manager`` role. @ericof [#63](https://github.com/plone/pytest-plone/issues/63)
+- `@pytest.mark.portal(content=[...])` and the `create_content` fixture now flush the CMFCore indexing queue once the content is in place, instead of calling `reindexObject()` on each item. `Products.CMFCore.indexing` queues index operations per thread and applies them at the transaction boundary, and a test has no transaction boundary between its fixtures and its assertions. `CatalogTool` flushes the queue on the paths that go through it — `searchResults`, `unrestrictedSearchResults`, `search`, `getCounter` — so catalog queries hid the problem, while methods inherited unwrapped from `ZCatalog`, such as `uniqueValuesFor()` and the dynamic vocabularies and facet listings built on it, read stale indexes and saw the last item created missing. The old `reindexObject()` loop only enqueued more work, which is why the failure looked order-dependent. The marker also flushes after applying profiles and roles, so content created by a profile's import steps is indexed too. @kunalKumar-13 [#65](https://github.com/plone/pytest-plone/issues/65)
+- The `apply_profiles` fixture now flushes the indexing queue too, so content created by a profile's import steps is in the catalog indexes when profiles are applied outside `@pytest.mark.portal`. @ericof [#65](https://github.com/plone/pytest-plone/issues/65)
+
+
+### Internal:
+
+- Move `dependabot.yml` from the repository root into `.github/`, which is the only path GitHub reads it from. The config declared a weekly `github-actions` check but had never run — no Dependabot pull request has ever been opened on this repository, while sibling repos that keep the file in `.github/` get them routinely. @kunalKumar-13 [#64](https://github.com/plone/pytest-plone/issues/64)
+- Dependabot pull requests, and pull requests labeled `skip changelog`, now skip the change log check. Dependabot labels its pull requests `dependencies`, `github_actions` and `skip changelog`. @ericof [#69](https://github.com/plone/pytest-plone/issues/69)
+- Queue GitHub Pages deployments, so documentation deploys from merges that land close together no longer fail with "in progress deployment". @ericof 
+- Reformat the Python code blocks in the docs and README with the current ``ruff``, which now formats fenced code inside Markdown. Keeps the unpinned lint CI green. @jensens 
+
 ## 1.1.0 (2026-07-13)
 
 

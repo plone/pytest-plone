@@ -1,1 +1,0 @@
-Queue GitHub Pages deployments, so documentation deploys from merges that land close together no longer fail with "in progress deployment". @ericof
